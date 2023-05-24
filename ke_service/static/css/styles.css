@@ -1,0 +1,28 @@
+body {
+    background: efefef;
+}
+
+
+.row {
+    margin: 50px;
+
+}
+
+h2 {
+color: red;
+}
+
+.col-md-6 {
+    padding: 10px;
+}
+
+.btn-primary {
+    margin-top: 20px;
+
+}
+
+
+.form-group {
+    padding-top: 10px;
+
+}
