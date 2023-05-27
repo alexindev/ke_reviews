@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from ke_app.urls import urlpatterns
-from ke_app.views import page_not_found
+from main_app.urls import urlpatterns
+from main_app.views import page_not_found
 
 urlpatterns = [
     path('admin/', admin.site.urls),
