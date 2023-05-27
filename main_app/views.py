@@ -4,9 +4,14 @@ from django.views import View
 
 class MainPage(View):
     template_name = 'main_app/index.html'
+    context = {
+        'user': 'boss',
+        'age': 10
+    }
 
     def get(self, request):
-        return render(request, self.template_name)
+        return render(request, self.template_name, context=self.context)
+
 
 def auth_page(request):
     return render(request, 'main_app/auth.html')
