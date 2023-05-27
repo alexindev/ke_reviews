@@ -1,5 +1,5 @@
 """
-WSGI config for ke_service ke_app.
+WSGI config for ke_service main_app.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
