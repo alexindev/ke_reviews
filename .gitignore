@@ -3,3 +3,4 @@
 /.idea
 *.env
 *.gitignore
+*__pycache__

@@ -4,7 +4,7 @@
   <div class="row justify-content-center mt-5">
     <div class="col-md-4">
       <h2 class="mb-4">Регистрация</h2>
-      <form method="POST" action="{% url 'reg_page_url' %}">
+      <form method="POST" action="{% url 'main_app:reg_page_url' %}">
         {% csrf_token %}
         <div class="form-group">
           <label for="email"><i class="fas fa-envelope"></i> Email адрес</label>
