@@ -5,13 +5,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-    {% block title %}
-    {% if title %}
+        {% if title %}
         {{ title }}
-    {% else %}
-        KE Services
-    {% endif %}
-    {% endblock %}
+        {% else %}
+            KE Services
+        {% endif %}
     </title>
 	<!-- Load fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
@@ -27,7 +25,7 @@
 <body>
 	<div class="jumbotron home home-fullscreen" id="home">
 		<div class="mask"></div>
-		<a href="#" class="logo">
+		<a href="{% url 'main_app:main_page_url' %}" class="logo">
 			<img src="{% static 'img/logo.png' %}" alt="KE Services">
 		</a>
 		<a href="" class="menu-toggle" id="nav-expander"><i class="fa fa-bars"></i></a>
@@ -36,8 +34,9 @@
             <a href="#" class="close"><i class="fa fa-close"></i></a>
             <h3>Menu</h3>
             <ul class="nav">
+                <li><a href="{% url 'main_app:main_page_url' %}">На главную</a></li>
                 <li><a href="{% url 'main_app:auth_page_url' %}">Авторизация</a></li>
-                <li><a href="/auth" class="no-project">Личный кабинет</a></li>
+                <li><a href="{% url 'main_app:auth_page_url' %}" class="no-project">Личный кабинет</a></li>
                 <li><a href="{% url 'main_app:main_page_url' %}#parser" class="no-project">Парсер</a></li>
                 <li><a href="{% url 'main_app:main_page_url' %}#reviews" class="no-project">Генератор отзывов</a></li>
                 <li><a href="https://github.com/alexindev/ke_services" class="no-project">Код проекта</a></li>
@@ -49,18 +48,9 @@
                 <li><a href=""><i class="fa fa-vk"></i></a></li>
             </ul>
         </nav>
-		<div class="container">
-			<div class="header-info">
-				<h1>KE Servises</h1>
-				<p>Сервисы для работы с маркетплейсом KazanExpress
-				</p>
-				<a href="{% url 'main_app:auth_page_url' %}" class="btn btn-primary">Попробовать</a>
-			</div>
-		</div>
+    {% block header %} {% endblock %}
 	</div>
-
-    {% block content %}
-    {% endblock %}
+    {% block content %} {% endblock %}
 
 	<!-- Load jQuery -->
 	<script type="text/javascript" src="{% static 'js/jquery-1.11.2.min.js' %}"></script>

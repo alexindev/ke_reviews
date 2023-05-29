@@ -10,11 +10,13 @@ class MainPage(View):
 
 
 def auth_page(request):
-    return render(request, 'main_app/auth.html')
+    context = {'title': 'Авторизация пользователей'}
+    return render(request, 'main_app/auth.html', context=context)
 
 
 def reg_page(request):
-    return render(request, 'main_app/register.html')
+    context = {'title': 'Регистрация пользователей'}
+    return render(request, 'main_app/register.html', context=context)
 
 
 def page_not_found(request, exception):

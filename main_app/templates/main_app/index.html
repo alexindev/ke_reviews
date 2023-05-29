@@ -1,9 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}{% endblock %}
+{{ title }}
+
+{% block header %}
+    <div class="container">
+        <div class="header-info">
+            <h1>KE Servises</h1>
+            <p>Сервисы для работы с маркетплейсом KazanExpress
+            </p>
+            <a href="{% url 'main_app:auth_page_url' %}" class="btn btn-primary">Попробовать</a>
+        </div>
+    </div>
+{% endblock %}
 
 {% block content %}
-	<!-- Services section start -->
 	<section id="parser">
 		<div class="container">
 			<div class="row">
@@ -13,7 +23,6 @@
 			</div>
 		</div>
 	</section>
-
 	<section id="reviews" class="darker">
         <div class="container">
 			<div class="row">
