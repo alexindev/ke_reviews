@@ -4,4 +4,4 @@
 *.env
 *.gitignore
 *__pycache__
-../migrations/
+**/migrations/

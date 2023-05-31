@@ -8,10 +8,10 @@ body{
 /****************
 SECTION
 *****************/
-/*section{*/
-/*	background-color: #fff;*/
-/*	!*padding: 80px 0;*!*/
-/*}*/
+section{
+	background-color: #fff;
+	padding: 80px 0;
+}
 
 section.darker{
 	background-color: #fbfbfb;
@@ -150,7 +150,7 @@ a:focus{
 }
 
 .jumbotron p{
-	color: #fff;
+	color: #efefef;
 }
 
 .jumbotron .container{
@@ -170,6 +170,7 @@ a:focus{
 }
 
 .btn{
+	margin-top: 20px;
 	padding: 15px 30px;
 	border-radius: 0;
 	-webkit-transition: border-color 0.4s, color 0.4s;

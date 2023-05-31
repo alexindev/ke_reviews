@@ -6,21 +6,21 @@
     <div class="row d-flex justify-content-center align-items-center vh-100 mt-5">
       <div class="col-md-4 my-auto">
         <h2 class="mb-4 title">Авторизация</h2>
-        <form method="post" class="login-form">
+        <form method="post" class="login-form" action="{% url 'users:auth_page_url' %}">
           {% csrf_token %}
           <div class="form-group">
-            <label for="username"><i class="fa fa-user"></i> Логин:</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+            <label for="{{ form.username.id_for_label }}"><i class="fa fa-user"></i> Логин:</label>
+            {{ form.username }}
           </div>
           <div class="form-group">
-            <label for="password"><i class="fa fa-lock"></i> Пароль:</label>
-            <input type="password" class="form-control" id="password" name="password" required>
+            <label for="{{ form.password.id_for_label }}"><i class="fa fa-lock"></i> Пароль:</label>
+           {{ form.password }}
           </div>
-          <div class="form-group text-center">
+          <div class="form-group">
             <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Авторизоваться</button>
           </div>
           <p class="form">
-            Еще не зарегистрированы? <a href="{% url 'main_app:reg_page_url' %}">Зарегистрируйтесь</a>
+            Еще не зарегистрированы? <a href="{% url 'users:reg_page_url' %}">Зарегистрируйтесь</a>
           </p>
         </form>
       </div>
