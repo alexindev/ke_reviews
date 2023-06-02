@@ -29,27 +29,11 @@
 			<img src="{% static 'img/logo.png' %}" alt="KE Services">
 		</a>
 		<a href="" class="menu-toggle" id="nav-expander"><i class="fa fa-bars"></i></a>
-		<!-- Offsite navigation -->
-		<nav class="menu">
-            <a href="#" class="close"><i class="fa fa-close"></i></a>
-            <h3>Menu</h3>
-            <ul class="nav">
-                <li><a href="{% url 'main_app:main_page_url' %}">На главную</a></li>
-                <li><a href="{% url 'users:auth_page_url' %}">Авторизация</a></li>
-                <li><a href="{% url 'users:auth_page_url' %}" class="no-project">Личный кабинет</a></li>
-                <li><a href="{% url 'main_app:main_page_url' %}#parser" class="no-project">Парсер</a></li>
-                <li><a href="{% url 'main_app:main_page_url' %}#reviews" class="no-project">Генератор отзывов</a></li>
-                <li><a href="https://github.com/alexindev/ke_services" class="no-project">Код проекта</a></li>
-            </ul>
-            <ul class="social-icons">
-                <li><a href="https://github.com/alexindev/ke_services"><i class="fa fa-github"></i></a></li>
-                <li><a href=""><i class="fa fa-facebook"></i></a></li>
-                <li><a href=""><i class="fa fa-twitter"></i></a></li>
-                <li><a href=""><i class="fa fa-vk"></i></a></li>
-            </ul>
-        </nav>
+
+    {% block menu %} {% endblock %}
     {% block header %} {% endblock %}
 	</div>
+
     {% block content %} {% endblock %}
 
 	<!-- Load jQuery -->

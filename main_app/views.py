@@ -1,12 +1,7 @@
 from django.shortcuts import render
-from django.views import View
 
-
-class MainPage(View):
-    template_name = 'main_app/index.html'
-
-    def get(self, request):
-        return render(request, self.template_name)
+def main_page(request):
+    return render(request, 'main_app/index.html')
 
 
 def page_not_found(request, exception):

@@ -8,4 +8,5 @@ urlpatterns = [
 
     path('register/', reg_page, name='reg_page_url'),
     path('auth/', auth_page, name='auth_page_url'),
+    path('cabinet/', cabinet_page, name='caninet_url')
 ]
