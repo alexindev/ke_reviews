@@ -1,22 +1,22 @@
-from django.shortcuts import render, reverse, HttpResponseRedirect
-from .forms import LoginForm, RegistrationForm
 from django.contrib import auth
+from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import render, reverse, HttpResponseRedirect
 from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
+
 from users.models import Users
+from common.title import TitleMixin
+from .forms import LoginForm, RegistrationForm
 
 
-class UserRegustrationView(CreateView):
+class UserRegustrationView(TitleMixin, SuccessMessageMixin, CreateView):
     template_name = 'users/register.html'
     form_class = RegistrationForm
     model = Users
     success_url = reverse_lazy('users:auth_page_url')
-
-    def get_context_data(self, **kwargs):
-        context = super(UserRegustrationView, self).get_context_data()
-        context['title'] = 'Регистрация пользователей'
-        return context
+    success_message = 'Регистрация выполнена успешно'
+    title = 'Регистрация пользователей'
 
 
 def auth_page(request):
@@ -41,13 +41,9 @@ def auth_page(request):
     return HttpResponseRedirect(reverse('users:profile_url', args=(request.user.pk,)))
 
 
-class ProfileUpdateView(TemplateView):
+class ProfileUpdateView(TitleMixin, TemplateView):
     template_name = 'users/profile.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ProfileUpdateView, self).get_context_data()
-        context['title'] = 'Личный кабинет'
-        return context
+    title = 'Личный кабинет'
 
 
 def logout(request):

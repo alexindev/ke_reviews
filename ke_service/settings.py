@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+from django.urls import reverse_lazy
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -135,5 +136,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.Users'
 
-LOGIN_URL = '/users/auth/'
-LOGIN_REDIRECT_URL = 'users/profile/'
+LOGIN_URL = reverse_lazy('users:auth_page_url')
+
