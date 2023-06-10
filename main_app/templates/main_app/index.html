@@ -7,11 +7,11 @@
 {% block header %}
     <div class="container">
         <div class="header-info">
-            <h1>KE Servises</h1>
+            <h1>KE Services</h1>
             <p>Сервисы для работы с маркетплейсом KazanExpress
             </p>
             <a href="{% if user.is_authenticated %}
-                    {% url 'users:caninet_url' %}
+                    {% url 'users:profile_url' %}
                     {% else %}{% url 'users:auth_page_url' %}
                     {% endif %}" class="btn btn-primary">Попробовать</a>
         </div>

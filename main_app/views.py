@@ -1,7 +1,14 @@
 from django.shortcuts import render
+from django.views.generic.base import TemplateView
 
-def main_page(request):
-    return render(request, 'main_app/index.html')
+
+class MainPageView(TemplateView):
+    template_name = 'main_app/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MainPageView, self).get_context_data()
+        context['title'] = 'KE Services'
+        return context
 
 
 def page_not_found(request, exception):

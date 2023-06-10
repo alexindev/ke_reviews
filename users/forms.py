@@ -18,7 +18,7 @@ class LoginForm(AuthenticationForm):
         fields = ('username', 'password')
 
 
-class RegisterForm(UserCreationForm):
+class RegistrationForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'Введите логин'
