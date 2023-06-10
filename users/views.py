@@ -1,10 +1,22 @@
 from django.shortcuts import render, reverse, HttpResponseRedirect
 from .forms import LoginForm, RegistrationForm
-from django.contrib import auth, messages
-from django.contrib.auth.decorators import login_required
+from django.contrib import auth
 from django.views.generic.edit import CreateView
+from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
 from users.models import Users
+
+
+class UserRegustrationView(CreateView):
+    template_name = 'users/register.html'
+    form_class = RegistrationForm
+    model = Users
+    success_url = reverse_lazy('users:auth_page_url')
+
+    def get_context_data(self, **kwargs):
+        context = super(UserRegustrationView, self).get_context_data()
+        context['title'] = 'Регистрация пользователей'
+        return context
 
 
 def auth_page(request):
@@ -17,7 +29,7 @@ def auth_page(request):
                 user = auth.authenticate(username=username, password=password)
                 if user:
                     auth.login(request, user)
-                    return HttpResponseRedirect(reverse('users:profile_url'))
+                    return HttpResponseRedirect(reverse('users:profile_url', args=(request.user.pk,)))
         else:
             form = LoginForm()
 
@@ -26,24 +38,16 @@ def auth_page(request):
             'form': form
         }
         return render(request, 'users/auth.html', context=context)
-    return HttpResponseRedirect(reverse('users:profile_url'))
-
-class UserRegustrationView(CreateView):
-    template_name = 'users/register.html'
-    form_class = RegistrationForm
-    model = Users
-    success_url = reverse_lazy('users:auth_page_url')
+    return HttpResponseRedirect(reverse('users:profile_url', args=(request.user.pk,)))
 
 
-@login_required
-def profile_page(request):
-    if request.user.is_authenticated:
-        context = {
-            'title': 'Личный кабинет'
-        }
-        return render(request, 'users/profile.html', context=context)
-    else:
-        return HttpResponseRedirect(reverse('users:auth_page_url'))
+class ProfileUpdateView(TemplateView):
+    template_name = 'users/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileUpdateView, self).get_context_data()
+        context['title'] = 'Личный кабинет'
+        return context
 
 
 def logout(request):
