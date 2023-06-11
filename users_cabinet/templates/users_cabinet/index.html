@@ -4,7 +4,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Личный кабинет</title>
+      <title>
+        {% if title %}
+        {{ title }}
+        {% else %}
+            Личный кабинет
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'vendors/iconfonts/mdi/css/materialdesignicons.css' %}">
     <link rel="stylesheet" href="{% static 'css/shared/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/demo/style.css' %}">
@@ -25,25 +31,25 @@
         <ul class="navigation-menu">
           <li class="nav-category-divider">MAIN</li>
           <li>
-            <a href="#">
+            <a href="{% url 'users_cabinet:users_profile_url' %}">
               <span class="link-title">Дашборд</span>
               <i class="mdi mdi-gauge link-icon"></i>
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="{% url 'users_cabinet:parser_url' %}">
               <span class="link-title">Парсер</span>
               <i class="mdi mdi-flask link-icon"></i>
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="{% url 'users_cabinet:reviews_url' %}">
               <span class="link-title">Работа с отзывами</span>
               <i class="mdi mdi-comment-processing-outline link-icon"></i>
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="{% url 'users_cabinet:profile_settings_url' %}">
               <span class="link-title">Настройки</span>
               <i class="mdi mdi-settings-outline link-icon"></i>
             </a>
@@ -55,6 +61,13 @@
             </a>
           </li>
         </ul>
+          <footer class="footer">
+          <div class="row">
+            <div class="text-center text-sm-left mt-3 mt-sm-0">
+                <small class="text-muted d-block">Copyright © 2023 <a href="https://github.com/alexindev/ke_services" target="_blank">Исходный код</a></small>
+            </div>
+          </div>
+        </footer>
       </div>
 
       <div class="page-content-wrapper">
@@ -62,28 +75,15 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
-                <h4>Панель управления</h4>
-                <p class="text-gray">Панель управления </p>
+                {% block content %}{% endblock %}
+
               </div>
             </div>
 
-            <div class="row">
-                Tables
-            </div>
 
           </div>
         </div>
       </div>
-
-
-        <footer class="footer">
-          <div class="row">
-            <div class="col-sm-6 text-center text-sm-left mt-3 mt-sm-0">
-              <small class="text-muted d-block">Copyright © 2023 <a href="https://github.com/alexindev/ke_services" target="_blank">Исходный код</a>. All rights reserved</small>
-            </div>
-          </div>
-        </footer>
-
     </div>
 
 
