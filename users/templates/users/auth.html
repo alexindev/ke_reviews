@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{{ title }}
+{% block menu %}
+{% include 'menu.html' %}
+{% endblock %}
+{% block header %}
+
+<div class="row d-flex justify-content-center align-items-center vh-100 mt-5">
+  <div class="col-md-4 my-auto">
+    <h2 class="mb-4 title">Авторизация</h2>
+    {% if form.non_field_errors or messages %}
+      {% if messages %}
+        <div class="alert alert-success">
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+    {% endif %}
+    <form method="post" class="login-form" action="{% url 'users:auth_page_url' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}"><i class="fa fa-user"></i> Логин:</label>
+        {{ form.username }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}"><i class="fa fa-lock"></i> Пароль:</label>
+        {{ form.password }}
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Авторизоваться</button>
+      </div>
+      <p class="form">
+        Еще не зарегистрированы? <a href="{% url 'users:reg_page_url' %}">Зарегистрируйтесь</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+
+
+{% endblock %}
+

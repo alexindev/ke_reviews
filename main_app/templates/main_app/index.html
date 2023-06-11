@@ -1,20 +1,61 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<div class="row" >
-    <h1>Welcome to KE services!</h1>
-    <h5>Инструменты автоматизации для работы с маркетплейсом KazanExpress</h5>
-</div>
+{{ title }}
+{% block menu %}
+{% include 'menu.html' %}
+{% endblock %}
+{% block header %}
+    <div class="container">
+        <div class="header-info">
+            <h1>KE Services</h1>
+            <p>Сервисы для работы с маркетплейсом KazanExpress
+            </p>
+            <a href="{% if user.is_authenticated %}
+                        {% url 'users_cabinet:users_profile_url' %}
+                    {% else %}
+                        {% url 'users:auth_page_url' %}
+                    {% endif %}" class="btn btn-primary">Попробовать</a>
+        </div>
+    </div>
+{% endblock %}
 
-<div class="row">
-  <section id="parser">
-    <p>Раздел презентации парсера</p>
-  </section>
-  <section id="reviews">
-    <p>Раздел презентации сервиса генерации отзывов</p>
-  </section>
-</div>
-    <p>{{ user }}</p>
-    <p>{{ age }}</p>
+{% block content %}
+	<section id="parser">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+                    <h2> Секция парсер</h2>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section id="reviews" class="darker">
+        <div class="container">
+			<div class="row">
+				<div class="col-md-4">
+                    <h2> Секция автоответчик отзывов</h2>
+                </div>
+            </div>
+        </div>
+	</section>
+	<!-- Footer start -->
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8">
+					<p>&copy; 2023 by <a href="https://github.com/alexindev/ke_services" target="_blank">GitHub</a></p>
+				</div>
+				<div class="col-md-4">
+					<ul class="social-icons">
+						<li><a href="https://github.com/alexindev/ke_services"><i class="fa fa-github"></i></a></li>
+						<li><a href=""><i class="fa fa-facebook"></i></a></li>
+						<li><a href=""><i class="fa fa-twitter"></i></a></li>
+						<li><a href=""><i class="fa fa-vk"></i></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- Footer end  -->
 
 {% endblock %}

@@ -1,24 +1,11 @@
 from django.shortcuts import render
-from django.views import View
+from django.views.generic.base import TemplateView
+from common.title import TitleMixin
 
 
-class MainPage(View):
+class MainPageView(TitleMixin, TemplateView):
     template_name = 'main_app/index.html'
-    context = {
-        'user': 'boss',
-        'age': 10
-    }
-
-    def get(self, request):
-        return render(request, self.template_name, context=self.context)
-
-
-def auth_page(request):
-    return render(request, 'main_app/auth.html')
-
-
-def reg_page(request):
-    return render(request, 'main_app/register.html')
+    title = 'Главная страница'
 
 
 def page_not_found(request, exception):
