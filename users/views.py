@@ -2,7 +2,7 @@ from django.contrib import auth
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, reverse, HttpResponseRedirect
 from django.views.generic.edit import CreateView
-from django.views.generic.base import TemplateView
+
 from django.urls import reverse_lazy
 
 from users.models import Users
@@ -29,7 +29,7 @@ def auth_page(request):
                 user = auth.authenticate(username=username, password=password)
                 if user:
                     auth.login(request, user)
-                    return HttpResponseRedirect(reverse('users:profile_url', args=(request.user.pk,)))
+                    return HttpResponseRedirect(reverse('users_cabinet:users_profile_url'))
         else:
             form = LoginForm()
 
@@ -38,14 +38,5 @@ def auth_page(request):
             'form': form
         }
         return render(request, 'users/auth.html', context=context)
-    return HttpResponseRedirect(reverse('users:profile_url', args=(request.user.pk,)))
+    return HttpResponseRedirect(reverse('users_cabinet:users_profile_url'))
 
-
-class ProfileUpdateView(TitleMixin, TemplateView):
-    template_name = 'users/profile.html'
-    title = 'Личный кабинет'
-
-
-def logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect(reverse('main_app:main_page_url'))

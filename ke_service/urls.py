@@ -20,7 +20,8 @@ from main_app.views import page_not_found
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main_app.urls', namespace='main_app')),
-    path('users/', include('users.urls', namespace='users'))
+    path('users/', include('users.urls', namespace='users')),
+    path('profile/', include('users_cabinet.urls', namespace='users_cabinet'))
 ]
 
 handler404 = page_not_found

@@ -4,7 +4,7 @@
     <ul class="nav">
         <li><a href="{% url 'main_app:main_page_url' %}">На главную</a></li>
         {% if user.is_authenticated %}
-            <li><a href="{% url 'users:profile_url' user.pk %}" class="no-project">Личный кабинет</a></li>
+            <li><a href="{% url 'users_cabinet:users_profile_url' %}" class="no-project">Личный кабинет</a></li>
         {% else %}
             <li><a href="{% url 'users:auth_page_url' %}">Авторизация</a></li>
         {% endif %}
@@ -12,7 +12,7 @@
         <li><a href="{% url 'main_app:main_page_url' %}#reviews" class="no-project">Генератор отзывов</a></li>
         <li><a href="https://github.com/alexindev/ke_services" class="no-project">Код проекта</a></li>
         {% if user.is_authenticated %}
-            <li><a href="{% url 'users:logout_url' %}" class="no-project">Выйти</a></li>
+            <li><a href="{% url 'users_cabinet:logout_url' %}" class="no-project">Выйти</a></li>
         {% endif %}
     </ul>
     <ul class="social-icons">

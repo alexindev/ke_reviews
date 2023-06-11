@@ -11,7 +11,7 @@
             <p>Сервисы для работы с маркетплейсом KazanExpress
             </p>
             <a href="{% if user.is_authenticated %}
-                        {% url 'users:profile_url' user.pk %}
+                        {% url 'users_cabinet:users_profile_url' %}
                     {% else %}
                         {% url 'users:auth_page_url' %}
                     {% endif %}" class="btn btn-primary">Попробовать</a>
