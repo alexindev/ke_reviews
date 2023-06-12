@@ -1,9 +1,9 @@
 from common.title import TitleMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.contrib import auth
-from django.shortcuts import reverse, HttpResponseRedirect
 from users.models import Users
+from django.contrib.auth.views import LogoutView
+from django.urls import reverse_lazy
 
 
 class ProfileView(TitleMixin, ListView):
@@ -30,6 +30,6 @@ class ReviewsView(TitleMixin, ListView):
     title = 'Отзывы'
 
 
-def logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect(reverse('main_app:main_page_url'))
+class UserLogoutView(LogoutView):
+    next_page = reverse_lazy('main_app:main_page_url')
+
