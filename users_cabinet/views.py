@@ -6,25 +6,25 @@ from django.shortcuts import reverse, HttpResponseRedirect
 from users.models import Users
 
 
-class ProfileDetailView(TitleMixin, ListView):
+class ProfileView(TitleMixin, ListView):
     template_name = 'users_cabinet/profile.html'
     model = Users
     title = 'Главное меню'
 
 
-class SettingsTemplateView(TitleMixin, ListView):
+class SettingsView(TitleMixin, ListView):
     template_name = 'users_cabinet/settings.html'
     model = Users
     title = 'Настройки'
 
 
-class ParserTemplateView(TitleMixin, ListView):
+class ParserView(TitleMixin, ListView):
     template_name = 'users_cabinet/parser.html'
     model = Users
     title = 'Парсер'
 
 
-class ReviewsTemplateView(TitleMixin, ListView):
+class ReviewsView(TitleMixin, ListView):
     template_name = 'users_cabinet/reviews.html'
     model = Users
     title = 'Отзывы'
