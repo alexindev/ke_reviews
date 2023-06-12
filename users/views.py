@@ -1,8 +1,6 @@
-from django.contrib import auth
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render, reverse, HttpResponseRedirect
+from django.contrib.auth.views import LoginView
 from django.views.generic.edit import CreateView
-
 from django.urls import reverse_lazy
 
 from users.models import Users
@@ -19,24 +17,10 @@ class UserRegustrationView(TitleMixin, SuccessMessageMixin, CreateView):
     title = 'Регистрация пользователей'
 
 
-def auth_page(request):
-    if not request.user.is_authenticated:
-        if request.method == 'POST':
-            form = LoginForm(data=request.POST)
-            if form.is_valid():
-                username = request.POST['username']
-                password = request.POST['password']
-                user = auth.authenticate(username=username, password=password)
-                if user:
-                    auth.login(request, user)
-                    return HttpResponseRedirect(reverse('users_cabinet:users_profile_url'))
-        else:
-            form = LoginForm()
+class UserAuthView(LoginView):
+    template_name = 'users/auth.html'
+    success_url = reverse_lazy('users_cabinet:users_profile_url')
+    form_class = LoginForm
+    redirect_authenticated_user = True
 
-        context = {
-            'title': 'Авторизация пользователей',
-            'form': form
-        }
-        return render(request, 'users/auth.html', context=context)
-    return HttpResponseRedirect(reverse('users_cabinet:users_profile_url'))
 
