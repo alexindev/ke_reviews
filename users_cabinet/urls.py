@@ -11,6 +11,4 @@ urlpatterns = [
     path('parser/', login_required(ParserView.as_view()), name='parser_url'),
     path('reviews/', login_required(ReviewsView.as_view()), name='reviews_url'),
     path('logout/', UserLogoutView.as_view(), name='logout_url'),
-
-
 ]

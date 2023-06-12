@@ -23,7 +23,4 @@ class UserAuthView(LoginView):
     form_class = LoginForm
     redirect_authenticated_user = True
 
-    def form_valid(self, form):
-        return super(UserAuthView, self).form_valid(form)
-
 
