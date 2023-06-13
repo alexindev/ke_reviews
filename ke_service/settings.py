@@ -82,9 +82,13 @@ WSGI_APPLICATION = 'ke_service.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.getenv('DB_NAME'),
+        "USER": os.getenv('PG_USER'),
+        "PASSWORD": os.getenv('PG_PASSWORD'),
+        "HOST": os.getenv('PG_HOST'),
+        "PORT": os.getenv('PG_PORT'),
     }
 }
 
