@@ -1,6 +1,36 @@
 {% extends 'users_cabinet/index.html' %}
 {{ title }}
 {% block content %}
-    <h4>Меню настроек</h4>
-    <p class="text-gray">Панель управления</p>
+
+    <div class="row">
+        <div class="col-12 py-5">
+            <h4>Меню настроек</h4>
+            <p class="text-gray">Панель управления</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 equel-grid">
+            <div class="grid widget-revenue-card">
+                <div class="grid-body d-flex flex-column h-100">
+                    Управление магазинами
+                </div>
+            </div>
+        </div>
+    </div>    <div class="row">
+        <div class="col-12 equel-grid">
+            <div class="grid widget-revenue-card">
+                <div class="grid-body d-flex flex-column h-100">
+                    Настройки для генерации отзывов
+                </div>
+            </div>
+        </div>
+    </div>    <div class="row">
+        <div class="col-12 equel-grid">
+            <div class="grid widget-revenue-card">
+                <div class="grid-body d-flex flex-column h-100">
+                    Смена аватара
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
