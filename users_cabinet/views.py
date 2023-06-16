@@ -1,9 +1,12 @@
 from common.title import TitleMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views.generic.edit import FormView
 from users.models import Users
 from django.contrib.auth.views import LogoutView
 from django.urls import reverse_lazy
+
+from .forms import UserPicForm
 
 
 class ProfileView(TitleMixin, ListView):
@@ -12,11 +15,12 @@ class ProfileView(TitleMixin, ListView):
     title = 'Главное меню'
 
 
-class SettingsView(TitleMixin, ListView):
+class SettingsView(TitleMixin, FormView):
     template_name = 'users_cabinet/settings.html'
     model = Users
     title = 'Настройки'
-
+    form_class = UserPicForm
+    success_url = reverse_lazy('users_cabinet:profile_settings_url')
 
 class ParserView(TitleMixin, ListView):
     template_name = 'users_cabinet/parser.html'
