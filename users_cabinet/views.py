@@ -1,12 +1,13 @@
-from common.title import TitleMixin
-from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
-from users.models import Users
 from django.contrib.auth.views import LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 
-from .forms import UserPicForm
+from users.models import Users
+
+from common.title import TitleMixin
+from .forms import UserPicForm, UserDataForm
 
 
 class ProfileView(TitleMixin, ListView):
@@ -17,10 +18,28 @@ class ProfileView(TitleMixin, ListView):
 
 class SettingsView(TitleMixin, FormView):
     template_name = 'users_cabinet/settings.html'
-    model = Users
     title = 'Настройки'
     form_class = UserPicForm
     success_url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['avatar_form'] = UserPicForm(instance=self.request.user)
+        context['user_data_form'] = UserDataForm(instance=self.request.user)
+        return context
+
+    def form_valid(self, form):
+        if 'avatar_btn' in self.request.POST:
+            avatar_form = UserPicForm(self.request.POST, self.request.FILES, instance=self.request.user)
+            if avatar_form.is_valid():
+                avatar_form.save()
+
+        elif 'user_data_btn' in self.request.POST:
+            user_data_form = UserDataForm(self.request.POST, instance=self.request.user)
+            if user_data_form.is_valid():
+                user_data_form.save()
+        return super().form_valid(form)
+
 
 class ParserView(TitleMixin, ListView):
     template_name = 'users_cabinet/parser.html'

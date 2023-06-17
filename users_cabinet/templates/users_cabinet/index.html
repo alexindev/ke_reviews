@@ -22,7 +22,9 @@
       <div class="sidebar">
         <div class="user-profile">
           <div class="display-avatar animated-avatar">
-            <img class="profile-img img-lg rounded-circle" src="#" alt="profile image">
+            <img class="profile-img img-lg rounded-circle" src="{% if user.image %}
+                                                                    {{ user.image.url }}
+                                                                {% else %}#{% endif %}" alt="profile image">
           </div>
           <div class="info-wrapper">
             <p class="user-name">Привет, {{ user }}!</p>

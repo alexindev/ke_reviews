@@ -18,11 +18,27 @@
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <div class="grid">
                 <div class="grid-body d-flex flex-column h-100">
-                    Настройки для генерации отзывов
+                    <h4 class="mb-3">Настройки для генерации отзывов</h4>
+                    <form method="post" enctype="multipart/form-data"
+                          action="{% url 'users_cabinet:profile_settings_url' %}">
+                        {% csrf_token %}
+                        <div class="row row-showcase-row-area mb-3">
+                            <div class="col-5">
+                                {{ user_data_form.login_ke }}
+                                {{ user_data_form.pass_ke }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-outline-primary" type="submit" name="user_data_btn">Сохранить</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -39,15 +55,18 @@
                         <div class="row row-showcase-row-area mb-3">
                             <div class="col-5">
                                 <div class="custom-file">
-                                    {{ form.image }}
-                                    <label class="custom-file-label" for="{{ form.image.id_for_label }}">Выберите
-                                        изображение</label>
+                                    {{ avatar_form.image }}
+                                    <label class="custom-file-label" for="{{ avatart_form.image.id_for_label }}">
+                                        {% if user.image %}
+                                            {{ user.image.name|cut:'user_pic/'}}
+                                        {% else %}Выберите изображение{% endif %}
+                                    </label>
                                 </div>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-12 mt-3">
-                                <button class="btn btn-outline-primary" type="submit">Сохранить</button>
+                                <button class="btn btn-outline-primary" type="submit" name="avatar_btn">Сохранить</button>
                             </div>
                         </div>
                     </form>
