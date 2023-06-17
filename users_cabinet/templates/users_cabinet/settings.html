@@ -1,14 +1,24 @@
 {% extends 'users_cabinet/index.html' %}
 
 {{ title }}
-{% block content %}
 
+{% block content %}
     <div class="row">
         <div class="col-12 py-5">
             <h4>Меню настроек</h4>
             <p class="text-gray">Панель управления</p>
         </div>
     </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
     <div class="row">
         <div class="col-12">
             <div class="grid">
@@ -35,7 +45,8 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-12 mt-3">
-                                <button class="btn btn-outline-primary" type="submit" name="user_data_btn">Сохранить</button>
+                                <button class="btn btn-outline-primary" type="submit" name="user_data_btn">Сохранить
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -58,7 +69,7 @@
                                     {{ avatar_form.image }}
                                     <label class="custom-file-label" for="{{ avatart_form.image.id_for_label }}">
                                         {% if user.image %}
-                                            {{ user.image.name|cut:'user_pic/'}}
+                                            {{ user.image.name|cut:'user_pic/' }}
                                         {% else %}Выберите изображение{% endif %}
                                     </label>
                                 </div>
@@ -66,7 +77,8 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-12 mt-3">
-                                <button class="btn btn-outline-primary" type="submit" name="avatar_btn">Сохранить</button>
+                                <button class="btn btn-outline-primary" type="submit" name="avatar_btn">Сохранить
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -74,6 +86,5 @@
             </div>
         </div>
     </div>
-
 
 {% endblock %}

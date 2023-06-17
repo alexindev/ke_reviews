@@ -16,10 +16,11 @@ class ProfileView(TitleMixin, ListView):
     title = 'Главное меню'
 
 
-class SettingsView(TitleMixin, FormView):
+class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
     template_name = 'users_cabinet/settings.html'
     title = 'Настройки'
     form_class = UserPicForm
+    success_message = 'Данные обновлены'
     success_url = reverse_lazy('users_cabinet:profile_settings_url')
 
     def get_context_data(self, **kwargs):
