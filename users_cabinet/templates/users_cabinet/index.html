@@ -22,7 +22,9 @@
       <div class="sidebar">
         <div class="user-profile">
           <div class="display-avatar animated-avatar">
-            <img class="profile-img img-lg rounded-circle" src="#" alt="profile image">
+            <img class="profile-img img-lg rounded-circle" src="{% if user.image %}
+                                                                    {{ user.image.url }}
+                                                                {% else %}#{% endif %}" alt="profile image">
           </div>
           <div class="info-wrapper">
             <p class="user-name">Привет, {{ user }}!</p>
@@ -73,20 +75,14 @@
       <div class="page-content-wrapper">
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
-            <div class="row">
-              <div class="col-12 py-5">
-                {% block content %}{% endblock %}
-
-              </div>
-            </div>
-
-
+              {% block content %}{% endblock %}
           </div>
         </div>
       </div>
     </div>
 
-
+    <script src="{% static 'js/form.js' %}"></script>
+    <script src="{% static 'js/allert-close.js' %}"></script>
 
   </body>
 </html>

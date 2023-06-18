@@ -1,6 +1,152 @@
 {% extends 'users_cabinet/index.html' %}
+
 {{ title }}
+
 {% block content %}
-    <h4>Панель управления</h4>
-    <p class="text-gray">Меню настроек </p>
+    <div class="row">
+        <div class="col-12 py-5">
+            <h4>Меню настроек</h4>
+            <p class="text-gray">Панель управления</p>
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="grid">
+                <div class="grid-body d-flex flex-column h-100">
+                    <h4 class="mb-2">Управление магазинами</h4>
+                    <p class="text-gray mb-2">Добавить новый магазин для отслеживания</p>
+                    <form method="post" enctype="multipart/form-data"
+                          action="{% url 'users_cabinet:profile_settings_url' %}">
+                        {% csrf_token %}
+                        <div class="row row-showcase-row-area mb-3">
+                            <div class="col-12">
+                                {{ store_form.store_url }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button class="btn btn-outline-primary" type="submit" name="store_btn">Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="grid">
+                <div class="grid-body d-flex flex-column h-100">
+                    <h4 class="mb-2">Магазины</h4>
+                    {% if store_urls %}
+                        <p class="text-gray mb-2">Добавленные магазины для отслеживания:</p>
+                        <ul>
+                            {% for store_url in store_urls %}
+                                <li>{{ store_url }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-gray">Ни одного магазина не добавлено</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="grid">
+                <div class="grid-body d-flex flex-column h-100">
+                    <h4 class="mb-2">Настройки для генерации отзывов</h4>
+                     <p class="text-gray mb-2">Данные от личного кабинета KazanExpress</p>
+                    <form method="post" enctype="multipart/form-data"
+                          action="{% url 'users_cabinet:profile_settings_url' %}">
+                        {% csrf_token %}
+                        <div class="row row-showcase-row-area mb-3">
+                            <div class="col-12">
+                                {{ user_data_form.login_ke }}
+                                {{ user_data_form.pass_ke }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-outline-primary" type="submit" name="user_data_btn">Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="grid">
+                <div class="grid-body d-flex flex-column h-100">
+                    <h4 class="mb-3">Проверка токена</h4>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="grid">
+                <div class="grid-body d-flex flex-column h-100">
+                    <h4 class="mb-2">Обновить аватар</h4>
+                    <p class="text-gray mb-2">Загрузить изображение профиля</p>
+                    <form method="post" enctype="multipart/form-data"
+                          action="{% url 'users_cabinet:profile_settings_url' %}">
+                        {% csrf_token %}
+                        <div class="row row-showcase-row-area mb-3">
+                            <div class="col-12">
+                                <div class="custom-file">
+                                    {{ avatar_form.image }}
+                                    <label class="custom-file-label" for="{{ avatart_form.image.id_for_label }}">
+                                        {% if user.image %}
+                                            {{ user.image.name|cut:'user_pic/' }}
+                                        {% else %}Выберите изображение{% endif %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-outline-primary" type="submit" name="avatar_btn">Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="grid">
+                <div class="grid-body d-flex flex-column h-100">
+                    <h4 class="mb-3">Удалить профиль</h4>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn btn-outline-danger" type="submit" name="avatar_btn">Удалить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}
