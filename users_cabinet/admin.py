@@ -1,3 +1,15 @@
 from django.contrib import admin
+from .models import Stores, UserStores, Reviews
 
-# Register your models here.
+@admin.register(Stores)
+class StoresAdmin(admin.ModelAdmin):
+    list_display = ['name', 'store_url']
+
+@admin.register(UserStores)
+class UserStoresAdmin(admin.ModelAdmin):
+    list_display = ['user', 'store', 'product', ]
+
+@admin.register(Reviews)
+class ReviewsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'store', 'product', 'text_review', 'rating']
+

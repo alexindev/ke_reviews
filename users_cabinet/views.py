@@ -5,9 +5,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 
 from users.models import Users
+from .models import UserStores
 
 from common.title import TitleMixin
-from .forms import UserPicForm, UserDataForm
+from .forms import UserPicForm, UserDataForm, StoreForm
 
 
 class ProfileView(TitleMixin, ListView):
@@ -27,6 +28,7 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['avatar_form'] = UserPicForm(instance=self.request.user)
         context['user_data_form'] = UserDataForm(instance=self.request.user)
+        context['store_form'] = StoreForm()
         return context
 
     def form_valid(self, form):
@@ -39,6 +41,13 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
             user_data_form = UserDataForm(self.request.POST, instance=self.request.user)
             if user_data_form.is_valid():
                 user_data_form.save()
+
+        elif 'store_btn' in self.request.POST:
+            store_form = StoreForm(self.request.POST)
+            if store_form.is_valid():
+                store = store_form.save()
+                UserStores.objects.create(store=store, user=self.request.user)
+
         return super().form_valid(form)
 
 

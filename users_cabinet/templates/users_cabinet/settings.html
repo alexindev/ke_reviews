@@ -23,7 +23,23 @@
         <div class="col-12">
             <div class="grid">
                 <div class="grid-body d-flex flex-column h-100">
-                    Управление магазинами
+                    <h4 class="mb-3">Управление магазинами</h4>
+                    <form method="post" enctype="multipart/form-data"
+                          action="{% url 'users_cabinet:profile_settings_url' %}">
+                        {% csrf_token %}
+                        <div class="row row-showcase-row-area mb-3">
+                            <div class="col-5">
+                                {{ store_form.name }}
+                                {{ store_form.store_url }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-outline-primary" type="submit" name="store_btn">Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
