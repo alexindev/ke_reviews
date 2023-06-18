@@ -28,10 +28,8 @@ class UserDataForm(forms.ModelForm):
 class StoreForm(forms.ModelForm):
     class Meta:
         model = Stores
-        fields = ['name', 'store_url']
+        fields = ['store_url']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control mb-3',
-                                           'placeholder': 'Ссылка на магазин'}),
             'store_url': forms.TextInput(attrs={'class': 'form-control',
-                                                'placeholder': 'Название магизина'})
+                                                'placeholder': 'Ссылка на магазин'})
         }

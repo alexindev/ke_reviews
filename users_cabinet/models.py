@@ -25,7 +25,6 @@ class UserStores(models.Model):
         return str(self.store)
 
 class Stores(models.Model):
-    name = models.CharField(max_length=50)
     store_url = models.CharField(max_length=100)
     users = models.ManyToManyField(Users, through='UserStores')
 
@@ -34,7 +33,7 @@ class Stores(models.Model):
         verbose_name_plural = 'Все магазины'
 
     def __str__(self):
-        return self.name
+        return self.store_url
 
 
 class Reviews(models.Model):
@@ -50,4 +49,3 @@ class Reviews(models.Model):
 
     def __str__(self):
         return self.product
-

@@ -29,6 +29,8 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         context['avatar_form'] = UserPicForm(instance=self.request.user)
         context['user_data_form'] = UserDataForm(instance=self.request.user)
         context['store_form'] = StoreForm()
+        store_urls = UserStores.objects.filter(user_id=self.request.user.pk).values_list('store__store_url', flat=True)
+        context['store_urls'] = store_urls
         return context
 
     def form_valid(self, form):
