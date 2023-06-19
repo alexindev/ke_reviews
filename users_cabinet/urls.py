@@ -11,4 +11,6 @@ urlpatterns = [
     path('parser/', login_required(ParserView.as_view()), name='parser_url'),
     path('reviews/', login_required(ReviewsView.as_view()), name='reviews_url'),
     path('logout/', UserLogoutView.as_view(), name='logout_url'),
+    path('delete_profile/', DeleteProfileView.as_view(), name='delete_profile_url'),
+    path('settings/<int:store_id>', delete_store, name='delete_store_url'),
 ]

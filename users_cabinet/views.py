@@ -1,7 +1,10 @@
+from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth import logout
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
 from users.models import Users
@@ -29,7 +32,7 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         context['avatar_form'] = UserPicForm(instance=self.request.user)
         context['user_data_form'] = UserDataForm(instance=self.request.user)
         context['store_form'] = StoreForm()
-        store_urls = UserStores.objects.filter(user_id=self.request.user.pk).values_list('store__store_url', flat=True)
+        store_urls = UserStores.objects.filter(user_id=self.request.user.pk).values('id', 'store__store_url')
         context['store_urls'] = store_urls
         return context
 
@@ -65,6 +68,17 @@ class ReviewsView(TitleMixin, ListView):
     title = 'Отзывы'
 
 
+class DeleteProfileView(View):
+    def post(self, request, *args, **kwargs):
+        self.request.user.delete()
+        logout(request)
+        return redirect(reverse_lazy('users:auth_page_url'))
+
+
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('main_app:main_page_url')
 
+
+def delete_store(request, store_id):
+    UserStores.objects.filter(id=store_id).delete()
+    return redirect(reverse_lazy('users_cabinet:profile_settings_url'))

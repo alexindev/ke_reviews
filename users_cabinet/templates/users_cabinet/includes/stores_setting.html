@@ -1,0 +1,49 @@
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="grid ">
+            <div class="grid-body d-flex flex-column h-100">
+                <h4 class="mb-2">Добавить магазин</h4>
+                <p class="text-gray mb-2">Новый магазин для отслеживания</p>
+                <form method="post" enctype="multipart/form-data"
+                      action="{% url 'users_cabinet:profile_settings_url' %}">
+                    {% csrf_token %}
+                    <div class="row row-showcase-row-area mb-3">
+                        <div class="col-12">
+                            {{ store_form.store_url }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit" name="store_btn">Добавить
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="grid">
+            <div class="grid-body d-flex flex-column h-100">
+                <h4 class="mb-2">Магазины</h4>
+                {% if store_urls %}
+                    <p class="text-gray mb-2">Добавленные магазины для отслеживания:</p>
+                    <ul>
+                        {% for store in store_urls %}
+                            <li>
+                                <a href="{{ store.id }}" class="delete-icon mr-1"
+                                >
+                                    <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>
+                                </a>
+
+                                {{ store.store__store_url }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray">Ни одного магазина не добавлено</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
