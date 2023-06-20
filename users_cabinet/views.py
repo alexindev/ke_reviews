@@ -6,7 +6,6 @@ from django.contrib.auth import logout
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django import forms
 
 from users.models import Users
 from .models import UserStores
@@ -54,11 +53,15 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
             store_form = StoreForm(self.request.POST)
             if store_form.is_valid():
                 store_url = store_form.cleaned_data['store_url']
-                if get_store(store_url):
-                    store = store_form.save()
-                    UserStores.objects.create(store=store, user=self.request.user)
+                if not UserStores.objects.filter(user=self.request.user, store__store_url=store_url).exists():
+                    if get_store(store_url):
+                        store = store_form.save()
+                        UserStores.objects.create(store=store, user=self.request.user)
+                    else:
+                        form.add_error('store_url', 'Некорректная ссылка или магазина не существует')
+                        return super().form_invalid(form)
                 else:
-                    form.add_error('store_url', 'Некорректная ссылка или магазина не существует')
+                    form.add_error('store_url', 'Магазина уже добавлен')
                     return super().form_invalid(form)
         return super().form_valid(form)
 

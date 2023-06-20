@@ -3,7 +3,12 @@
         <div class="grid ">
             <div class="grid-body d-flex flex-column h-100">
                 <h4 class="mb-2">Добавить магазин</h4>
-                <p class="text-gray mb-2">Новый магазин для отслеживания</p>
+                <p class="text-gray mb-2">
+                    Новый магазин для отслеживания
+                    <span class="tooltip-icon" title="Например: https://kazanexpress.ru/technostation">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </span>
+                </p>
                 <form method="post" enctype="multipart/form-data"
                       action="{% url 'users_cabinet:profile_settings_url' %}">
                     {% csrf_token %}
