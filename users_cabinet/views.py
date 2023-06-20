@@ -6,12 +6,15 @@ from django.contrib.auth import logout
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django import forms
 
 from users.models import Users
 from .models import UserStores
 
 from common.title import TitleMixin
 from .forms import UserPicForm, UserDataForm, StoreForm
+
+from .utils.stores import get_store
 
 
 class ProfileView(TitleMixin, ListView):
@@ -23,7 +26,7 @@ class ProfileView(TitleMixin, ListView):
 class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
     template_name = 'users_cabinet/settings.html'
     title = 'Настройки'
-    form_class = UserPicForm
+    form_class = StoreForm
     success_message = 'Данные обновлены'
     success_url = reverse_lazy('users_cabinet:profile_settings_url')
 
@@ -50,9 +53,13 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         elif 'store_btn' in self.request.POST:
             store_form = StoreForm(self.request.POST)
             if store_form.is_valid():
-                store = store_form.save()
-                UserStores.objects.create(store=store, user=self.request.user)
-
+                store_url = store_form.cleaned_data['store_url']
+                if get_store(store_url):
+                    store = store_form.save()
+                    UserStores.objects.create(store=store, user=self.request.user)
+                else:
+                    form.add_error('store_url', 'Некорректная ссылка или магазина не существует')
+                    return super().form_invalid(form)
         return super().form_valid(form)
 
 

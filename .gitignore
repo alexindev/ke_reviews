@@ -6,4 +6,4 @@
 *__pycache__
 /media
 *.jpg
-./main_app/migrations
+**/migrations/

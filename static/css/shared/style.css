@@ -7685,6 +7685,7 @@ h6 {
 
 .form-control,
 input[type="text"],
+input[type="url"],
 input[type="password"],
 input[type="email"],
 input[type="number"],
@@ -7694,6 +7695,7 @@ textarea {
   @media (min-width: 768px) and (max-width: 991px) {
     .form-control,
     input[type="text"],
+    input[type="url"],
     input[type="password"],
     input[type="email"],
     input[type="number"],
@@ -7703,6 +7705,7 @@ textarea {
   @media (min-width: 991px) and (max-width: 1200px) {
     .form-control,
     input[type="text"],
+    input[type="url"],
     input[type="password"],
     input[type="email"],
     input[type="number"],
@@ -7712,6 +7715,7 @@ textarea {
   @media (min-width: 1200px) {
     .form-control,
     input[type="text"],
+    input[type="url"],
     input[type="password"],
     input[type="email"],
     input[type="number"],
@@ -7720,6 +7724,7 @@ textarea {
       font-size: 13px; } }
   .form-control.placeholder,
   input[type="text"].placeholder,
+  input[type="url"].placeholder,
   input[type="password"].placeholder,
   input[type="email"].placeholder,
   input[type="number"].placeholder,
@@ -7731,6 +7736,7 @@ textarea {
     font-weight: inherit; }
   .form-control:-moz-placeholder,
   input[type="text"]:-moz-placeholder,
+  input[type="url"]:-moz-placeholder,
   input[type="password"]:-moz-placeholder,
   input[type="email"]:-moz-placeholder,
   input[type="number"]:-moz-placeholder,
@@ -7742,6 +7748,7 @@ textarea {
     font-weight: inherit; }
   .form-control::-moz-placeholder,
   input[type="text"]::-moz-placeholder,
+  input[type="url"]::-moz-placeholder,
   input[type="password"]::-moz-placeholder,
   input[type="email"]::-moz-placeholder,
   input[type="number"]::-moz-placeholder,
@@ -7753,6 +7760,7 @@ textarea {
     font-weight: inherit; }
   .form-control:-ms-input-placeholder,
   input[type="text"]:-ms-input-placeholder,
+  input[type="url"]:-ms-input-placeholder,
   input[type="password"]:-ms-input-placeholder,
   input[type="email"]:-ms-input-placeholder,
   input[type="number"]:-ms-input-placeholder,
@@ -7764,6 +7772,7 @@ textarea {
     font-weight: inherit; }
   .form-control::-webkit-input-placeholder,
   input[type="text"]::-webkit-input-placeholder,
+  input[type="url"]::-webkit-input-placeholder,
   input[type="password"]::-webkit-input-placeholder,
   input[type="email"]::-webkit-input-placeholder,
   input[type="number"]::-webkit-input-placeholder,
