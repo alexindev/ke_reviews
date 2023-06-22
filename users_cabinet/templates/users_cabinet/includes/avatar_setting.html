@@ -2,7 +2,7 @@
     <div class="col-12 col-md-6">
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
-                <h4 class="mb-2">Обновить аватар</h4>
+                <h5 class="mb-2">Обновить аватар</h5>
                 <p class="text-gray mb-2">Загрузить изображение профиля</p>
                 <form method="post" enctype="multipart/form-data"
                       action="{% url 'users_cabinet:profile_settings_url' %}">
@@ -14,7 +14,9 @@
                                 <label class="custom-file-label" for="{{ avatart_form.image.id_for_label }}">
                                     {% if user.image %}
                                         {{ user.image.name|cut:'user_pic/'|truncatechars:30 }}
-                                    {% else %}Выберите изображение{% endif %}
+                                    {% else %}
+                                        Выберите изображение
+                                    {% endif %}
                                 </label>
                             </div>
                         </div>

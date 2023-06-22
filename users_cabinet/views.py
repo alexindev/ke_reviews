@@ -71,6 +71,11 @@ class ParserView(TitleMixin, ListView):
     model = Users
     title = 'Парсер'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['store_urls'] = UserStores.objects.filter(user=self.request.user).values('store__store_url')
+        return context
+
 
 class ReviewsView(TitleMixin, ListView):
     template_name = 'users_cabinet/reviews.html'

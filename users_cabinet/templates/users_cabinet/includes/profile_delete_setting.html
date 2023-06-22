@@ -2,7 +2,7 @@
     <div class="col-12 col-md-6">
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
-                <h4 class="mb-3">Удалить профиль</h4>
+                <h5 class="mb-3">Удалить профиль</h5>
                 <form method="post" action="{% url 'users_cabinet:delete_profile_url' %}">
                     {% csrf_token %}
                     <div class="row">
