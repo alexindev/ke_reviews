@@ -36,11 +36,14 @@
                     <ul>
                         {% for store in store_urls %}
                             <li>
-                                <a href="{{ store.id }}" class="delete-icon mr-1"
-                                >
-                                    <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>
+                                <a href="{{ store.id }}" class="delete-icon">
+                                    <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
                                 </a>
-
+                                {% if store.store__store_status %}
+                                    <i class="fa fa-pause fa-lg text-warning " aria-hidden="true"></i>
+                                {% else %}
+                                    <i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>
+                                {% endif %}
                                 {{ store.store__store_url }}
                             </li>
                         {% endfor %}
