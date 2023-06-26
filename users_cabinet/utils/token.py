@@ -22,15 +22,13 @@ def get_token(login: str, password: str) -> Union[str, None]:
             context = browser.new_context()
             page = context.new_page()
             page.set_default_timeout(60000)
+            token = None
 
             def handle_request(route, request):
+                nonlocal token
                 headers = request.headers
                 if 'authorization' in headers and 'Bearer' in headers['authorization']:
                     token = headers['authorization'].split()[-1]
-                    context.close()
-                    browser.close()
-                    return token
-
                 # Продолжаем загрузку страницы
                 route.continue_()
 
@@ -40,6 +38,8 @@ def get_token(login: str, password: str) -> Union[str, None]:
             driver.login(login, password)
             context.close()
             browser.close()
-            return
+            return token
     except:
-        return
+        browser.close()
+        return None
+
