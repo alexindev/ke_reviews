@@ -4,6 +4,6 @@
 *.env
 *.gitignore
 *__pycache__
-**/migrations/
 /media
 *.jpg
+**/migrations/

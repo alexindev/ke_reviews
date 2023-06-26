@@ -1,0 +1,57 @@
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="grid ">
+            <div class="grid-body d-flex flex-column h-100">
+                <h5 class="mb-2">Добавить магазин</h5>
+                <p class="text-gray mb-2">
+                    Новый магазин для отслеживания
+                    <span class="tooltip-icon" title="Например: https://kazanexpress.ru/technostation">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </span>
+                </p>
+                <form method="post" enctype="multipart/form-data"
+                      action="{% url 'users_cabinet:profile_settings_url' %}">
+                    {% csrf_token %}
+                    <div class="row row-showcase-row-area mb-3">
+                        <div class="col-12">
+                            {{ store_form.store_url }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit" name="store_btn">Добавить
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="grid">
+            <div class="grid-body d-flex flex-column h-100">
+                <h5 class="mb-2">Магазины</h5>
+                {% if store_urls %}
+                    <p class="text-gray mb-2">Добавленные магазины для отслеживания:</p>
+                    <ul>
+                        {% for store in store_urls %}
+                            <li>
+                                <a href="{{ store.id }}" class="delete-icon">
+                                    <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
+                                </a>
+                                {% if store.store__store_status %}
+                                    <i class="fa fa-pause fa-lg text-warning " aria-hidden="true"></i>
+                                {% else %}
+                                    <i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>
+                                {% endif %}
+                                {{ store.store__store_url }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray">Ни одного магазина не добавлено</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

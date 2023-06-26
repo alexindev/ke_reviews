@@ -1,0 +1,54 @@
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="grid">
+            <div class="grid-body d-flex flex-column h-100">
+                <h5 class="mb-2">Генерация отзывов</h5>
+                <p class="text-gray mb-2">Данные от личного кабинета KazanExpress</p>
+                <form method="post" enctype="multipart/form-data"
+                      action="{% url 'users_cabinet:profile_settings_url' %}">
+                    {% csrf_token %}
+                    <div class="row row-showcase-row-area mb-3">
+                        <div class="col-12">
+                            {{ user_data_form.login_ke }}
+                            {{ user_data_form.pass_ke }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit" name="user_data_btn">Сохранить
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="grid">
+            <div class="grid-body d-flex flex-column h-100">
+                <h5 class="mb-2">Токен</h5>
+                <p class="text-gray">Работа с токеном</p>
+                {% if user.token %}
+                    <p class="text-success">Токен получен</p>
+                    <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-outline-primary mt-2" type="submit">Обновить токен</button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-outline-primary mt-2" type="submit">Получить токен</button>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -30,6 +30,8 @@ class StoreForm(forms.ModelForm):
         model = Stores
         fields = ['store_url']
         widgets = {
-            'store_url': forms.TextInput(attrs={'class': 'form-control',
-                                                'placeholder': 'Ссылка на магазин'})
+            'store_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ссылка на магазин',
+            })
         }

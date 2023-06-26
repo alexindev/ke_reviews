@@ -1,5 +1,4 @@
 {% extends 'users_cabinet/index.html' %}
-{{ title }}
 {% block content %}
     <div class="row">
         <div class="col-12 py-5">
@@ -7,13 +6,44 @@
             <p class="text-gray">Данные о продажах </p>
         </div>
     </div>
-     <div class="row">
+    <div class="row">
         <div class="col-12">
             <div class="grid">
                 <div class="grid-body d-flex flex-column h-100">
-                    Блок парсера
+                    <h5 class="mb-3">Блок парсера</h5>
+                    {% if not store_urls %}
+                        <p>Вы не добавили ни один магазин. Пожалуйста, добавьте магазины через настройки.</p>
+                    {% else %}
+                        <form method="get" action="{% url 'users_cabinet:parser_url' %}">
+                            <div class="form-row align-items-center">
+                                <div class="col-5">
+                                    <label for="store-select">Выберите магазин:</label>
+                                    <select class="form-control" id="store-select" name="store-select">
+                                        {% for url in store_urls %}
+                                            <option value="{{ url.store__store_url }}">{{ url.store__store_url }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-5">
+                                    <label for="period-select">Выберите период:</label>
+                                    <select class="form-control" id="period-select" name="period-select">
+                                        <option value="1">1 день</option>
+                                        <option value="3">3 дня</option>
+                                        <option value="7">7 дней</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-primary">Применить</button>
+                            </div>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+
+
+
+
 {% endblock %}

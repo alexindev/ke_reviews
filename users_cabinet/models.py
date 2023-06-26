@@ -4,15 +4,15 @@ from users.models import Users
 
 
 class UserStores(models.Model):
-    store_name = models.CharField(max_length=50)
-    product = models.CharField(max_length=200)
+    store_name = models.CharField(max_length=50, null=True)
+    product = models.CharField(max_length=200, null=True)
     price = models.PositiveIntegerField(default=0)
     sale = models.PositiveIntegerField(default=0)
-    stock_balance = models.PositiveIntegerField(default=0)
+    stock_balance = models.PositiveIntegerField(null=True)
     url = models.CharField(max_length=100)
-    rating = models.FloatField(default=0)
-    param1 = models.CharField(max_length=50, blank=True)
-    param2 = models.CharField(max_length=50, blank=True)
+    rating = models.FloatField(null=True)
+    param1 = models.CharField(max_length=50, null=True)
+    param2 = models.CharField(max_length=50, null=True)
     datetime = models.DateField(auto_now_add=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     store = models.ForeignKey('Stores', on_delete=models.CASCADE)
@@ -25,7 +25,8 @@ class UserStores(models.Model):
         return str(self.store)
 
 class Stores(models.Model):
-    store_url = models.CharField(max_length=100)
+    store_url = models.CharField(max_length=100, null=True, blank=True)
+    status = models.BooleanField(default=False)
     users = models.ManyToManyField(Users, through='UserStores')
 
     class Meta:
@@ -49,3 +50,4 @@ class Reviews(models.Model):
 
     def __str__(self):
         return self.product
+

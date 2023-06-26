@@ -82,13 +82,13 @@ WSGI_APPLICATION = 'ke_service.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv('DB_NAME'),
-        "USER": os.getenv('PG_USER'),
-        "PASSWORD": os.getenv('PG_PASSWORD'),
-        "HOST": os.getenv('PG_HOST'),
-        "PORT": os.getenv('PG_PORT'),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('PG_USER'),
+        'PASSWORD': os.getenv('PG_PASSWORD'),
+        'HOST': os.getenv('PG_HOST'),
+        'PORT': os.getenv('PG_PORT'),
     }
 }
 
@@ -148,3 +148,7 @@ AUTH_USER_MODEL = 'users.Users'
 LOGIN_URL = reverse_lazy('users:auth_page_url')
 LOGIN_REDIRECT_URL = reverse_lazy('users_cabinet:users_profile_url')
 
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
