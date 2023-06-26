@@ -24,14 +24,17 @@
 
     {% if form.errors %}
         <div class="alert alert-danger">
-            {% for field_errors in form.errors.values %}
-                {% for error in field_errors %}
-                    {{ error }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                {% endfor %}
-            {% endfor %}
+        {{ form.errors }}
+
+{#            {% for field_errors in form.errors.values %}#}
+
+{#                {% for error in field_errors %}#}
+{#                    {{ error }}#}
+{#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">#}
+{#                        <span aria-hidden="true">&times;</span>#}
+{#                    </button>#}
+{#                {% endfor %}#}
+{#            {% endfor %}#}
         </div>
     {% endif %}
 

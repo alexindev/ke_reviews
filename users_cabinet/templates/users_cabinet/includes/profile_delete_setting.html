@@ -2,12 +2,13 @@
     <div class="col-12 col-md-6">
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
-                <h5 class="mb-3">Удалить профиль</h5>
+                <h5 class="mb-2">Удалить профиль</h5>
+                <p class="text-gray ">Удалить все данные</p>
                 <form method="post" action="{% url 'users_cabinet:delete_profile_url' %}">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-12">
-                            <button class="btn btn-outline-danger" type="submit">Удалить</button>
+                            <button class="btn btn-outline-danger mt-2" type="submit">Удалить</button>
                         </div>
                     </div>
                 </form>

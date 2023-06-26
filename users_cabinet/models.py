@@ -25,7 +25,7 @@ class UserStores(models.Model):
         return str(self.store)
 
 class Stores(models.Model):
-    store_url = models.CharField(max_length=100)
+    store_url = models.CharField(max_length=100, null=True, blank=True)
     status = models.BooleanField(default=False)
     users = models.ManyToManyField(Users, through='UserStores')
 

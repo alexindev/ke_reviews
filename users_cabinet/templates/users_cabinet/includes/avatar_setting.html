@@ -8,7 +8,7 @@
                       action="{% url 'users_cabinet:profile_settings_url' %}">
                     {% csrf_token %}
                     <div class="row row-showcase-row-area mb-3">
-                        <div class="col-12 mb-3">
+                        <div class="col-12 mb-2">
                             <div class="custom-file">
                                 {{ avatar_form.image }}
                                 <label class="custom-file-label" for="{{ avatart_form.image.id_for_label }}">
