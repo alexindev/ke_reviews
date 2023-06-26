@@ -6,6 +6,8 @@ from django.contrib.auth import logout
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from datetime import datetime, timedelta
+from django.contrib import messages
 
 from users.models import Users
 from .models import UserStores
@@ -14,6 +16,7 @@ from common.title import TitleMixin
 from .forms import UserPicForm, UserDataForm, StoreForm
 
 from .utils.stores import get_store
+from .tasks import new_token
 
 
 class ProfileView(TitleMixin, ListView):
@@ -68,8 +71,14 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
 
 class ParserView(TitleMixin, ListView):
     template_name = 'users_cabinet/parser.html'
-    model = Users
+    model = UserStores
     title = 'Парсер'
+
+    def get_queryset(self):
+        period = self.request.GET.get('period-select')
+        store = self.request.GET.get('store-select')
+        queryset = UserStores.objects.filter(user=self.request.user, store__store_url=store)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -81,6 +90,16 @@ class ReviewsView(TitleMixin, ListView):
     template_name = 'users_cabinet/reviews.html'
     model = Users
     title = 'Отзывы'
+
+
+class GetTokenView(View):
+    def post(self, request):
+        user = request.user
+        login = user.login_ke
+        password = user.pass_ke
+        new_token.delay(login, password)
+        messages.success(request, 'Получаем токен...')
+        return redirect('users_cabinet:profile_settings_url')
 
 
 class DeleteProfileView(View):
