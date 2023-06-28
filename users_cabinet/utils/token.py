@@ -1,5 +1,4 @@
 from playwright.sync_api import sync_playwright
-from typing import Union
 
 
 class Browser:
@@ -14,7 +13,7 @@ class Browser:
         self.page.wait_for_timeout(5000)
 
 
-def get_token(login: str, password: str) -> Union[str, None]:
+def get_token(login: str, password: str) -> str | None:
     """ Получить JWT токен """
     try:
         with sync_playwright() as p:
@@ -42,4 +41,3 @@ def get_token(login: str, password: str) -> Union[str, None]:
     except:
         browser.close()
         return None
-

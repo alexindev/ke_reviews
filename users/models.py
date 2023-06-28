@@ -7,4 +7,5 @@ class Users(AbstractUser):
     pass_ke = CharField(max_length=50, null=True)
     token = CharField(max_length=100, null=True)
     token_valid = BooleanField(default=True)
+    login_valid = BooleanField(default=True)
 

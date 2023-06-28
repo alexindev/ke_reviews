@@ -28,38 +28,33 @@
             <div class="grid-body d-flex flex-column h-100">
                 <h5 class="mb-2">Токен</h5>
                 {% if user.token %}
-                    {% if user.token_valid %}
-                        <p class="text-success">Токен получен</p>
-                        <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-12">
-                                    <button class="btn btn-outline-primary mt-2" type="submit">Обновить токен</button>
-                                </div>
-                            </div>
-                        </form>
+                    {% if user.login_valid %}
+                        {% if user.token_valid %}
+                            <p class="text-success">Токен получен</p>
+                        {% else %}
+                            <p class="text-danger">Токен не валидный</p>
+                        {% endif %}
                     {% else %}
-                        <p class="text-danger">Токен невалидный</p>
-                        <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-12">
-                                    <button class="btn btn-outline-primary mt-2" type="submit">Обновить токен</button>
-                                </div>
-                            </div>
-                        </form>
+                        <p class="text-danger">Проверьте корректность логина и/или пароля</p>
                     {% endif %}
                 {% else %}
                     <p class="text-gray">Для работы сервиса отзывов необходимо получить токен</p>
-                    <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-12">
-                                <button class="btn btn-outline-primary mt-2" type="submit">Получить токен</button>
-                            </div>
-                        </div>
-                    </form>
                 {% endif %}
+
+                <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary mt-2" type="submit">
+                                {% if user.token %}
+                                    Обновить токен
+                                {% else %}
+                                    Получить токен
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

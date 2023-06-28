@@ -4,11 +4,13 @@ from users.models import Users
 
 
 @shared_task
-def new_token(login, password) -> bool:
+def new_token(login, password) -> str | None:
     token = get_token(login, password)
+    user = Users.objects.get(login_ke=login)
     if token:
-        user = Users.objects.get(login_ke=login)
+        user.login_valid = True
         user.token = token
-        user.save()
-        return True
-    return False
+    else:
+        user.login_valid = False
+    user.save()
+    return token
