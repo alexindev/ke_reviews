@@ -27,18 +27,30 @@
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
                 <h5 class="mb-2">Токен</h5>
-                <p class="text-gray">Работа с токеном</p>
                 {% if user.token %}
-                    <p class="text-success">Токен получен</p>
-                    <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-12">
-                                <button class="btn btn-outline-primary mt-2" type="submit">Обновить токен</button>
+                    {% if user.token_valid %}
+                        <p class="text-success">Токен получен</p>
+                        <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-outline-primary mt-2" type="submit">Обновить токен</button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    {% else %}
+                        <p class="text-danger">Токен невалидный</p>
+                        <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-outline-primary mt-2" type="submit">Обновить токен</button>
+                                </div>
+                            </div>
+                        </form>
+                    {% endif %}
                 {% else %}
+                    <p class="text-gray">Для работы сервиса отзывов необходимо получить токен</p>
                     <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
                         {% csrf_token %}
                         <div class="row">
