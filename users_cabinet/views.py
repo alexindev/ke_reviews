@@ -1,22 +1,20 @@
-from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
+from django.views.generic.base import RedirectView
 from django.contrib.auth.views import LogoutView
-from django.contrib.auth import logout
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from datetime import datetime, timedelta
+from django.contrib.auth import logout
 from django.contrib import messages
+from django.urls import reverse_lazy
 
 from users.models import Users
-from .models import UserStores
+from .models import UserStores, Stores
 
 from common.title import TitleMixin
 from .forms import UserPicForm, UserDataForm, StoreForm
 
 from .utils.stores import get_store
-from .tasks import new_token
+from .tasks import new_token, parser_manager
 
 
 class ProfileView(TitleMixin, ListView):
@@ -37,8 +35,10 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         context['avatar_form'] = UserPicForm(instance=self.request.user)
         context['user_data_form'] = UserDataForm(instance=self.request.user)
         context['store_form'] = StoreForm()
-        store_urls = UserStores.objects.filter(user_id=self.request.user.pk).values('id', 'store__store_url')
-        context['store_urls'] = store_urls
+
+        store_urls = Stores.objects.filter(userstores__user=self.request.user).values('id', 'store_url', 'action')
+        context['stores'] = store_urls
+
         return context
 
     def form_valid(self, form):
@@ -92,27 +92,44 @@ class ReviewsView(TitleMixin, ListView):
     title = 'Отзывы'
 
 
-class GetTokenView(View):
-    def post(self, request):
+class DeleteProfileView(RedirectView):
+    url = reverse_lazy('users:auth_page_url')
+
+    def post(self, request, *args, **kwargs):
+        self.request.user.delete()
+        logout(request)
+        return super().post(request, *args, **kwargs)
+
+
+class GetTokenView(RedirectView):
+    url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def post(self, request, *args, **kwargs):
         user = request.user
         login = user.login_ke
         password = user.pass_ke
         new_token.delay(login, password)
         messages.success(request, 'Получаем токен...')
-        return redirect('users_cabinet:profile_settings_url')
-
-
-class DeleteProfileView(View):
-    def post(self, request, *args, **kwargs):
-        self.request.user.delete()
-        logout(request)
-        return redirect(reverse_lazy('users:auth_page_url'))
+        return super().post(request, *args, **kwargs)
 
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('main_app:main_page_url')
 
 
-def delete_store(request, store_id):
-    UserStores.objects.filter(id=store_id).delete()
-    return redirect(reverse_lazy('users_cabinet:profile_settings_url'))
+class DeleteStoreView(RedirectView):
+    url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def get(self, request, *args, **kwargs):
+        Stores.objects.get(id=kwargs['store_id']).delete()
+        return super().get(request, *args, **kwargs)
+
+
+class ManagerStoreView(RedirectView):
+    url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def get(self, request, *args, **kwargs):
+        action = kwargs['action']
+        store_id = kwargs['store_id']
+        parser_manager.delay(action, store_id)
+        return super().get(self, request, *args, **kwargs)
