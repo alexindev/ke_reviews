@@ -26,7 +26,7 @@ class UserStores(models.Model):
 
 class Stores(models.Model):
     store_url = models.CharField(max_length=100, null=True, blank=True)
-    status = models.BooleanField(default=False)
+    action = models.CharField(max_length=5, default='play')
     users = models.ManyToManyField(Users, through='UserStores')
 
     class Meta:
