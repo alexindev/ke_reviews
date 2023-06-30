@@ -40,8 +40,10 @@ class Stores(models.Model):
 class Reviews(models.Model):
     store = models.CharField(max_length=50)
     product = models.CharField(max_length=200)
-    text_review = models.TextField(blank=True)
-    rating = models.SmallIntegerField()
+    content = models.TextField(blank=True, null=True)
+    rating = models.PositiveSmallIntegerField(null=True)
+    review_id = models.PositiveIntegerField(null=True)
+    date_create = models.DateField(null=True)
     user = models.ForeignKey(to=Users, on_delete=models.CASCADE)
 
     class Meta:

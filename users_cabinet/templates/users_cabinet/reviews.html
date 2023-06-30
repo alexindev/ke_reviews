@@ -1,17 +1,51 @@
 {% extends 'users_cabinet/index.html' %}
 {{ title }}
 {% block content %}
+
     <div class="row">
         <div class="col-12 py-5">
-            <h4>Отзывы</h4>
+            <h4>Работа с отзывами</h4>
             <p class="text-gray">Автоматический генератор отзывов</p>
         </div>
     </div>
-     <div class="row">
+    <div class="row">
         <div class="col-12">
             <div class="grid">
                 <div class="grid-body d-flex flex-column h-100">
-                    Блок отзывов
+                    <h5 class="mb-3">Все отзывы</h5>
+                    <form method="post" action="{% url 'users_cabinet:reviews_url' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-primary mb-3" type="submit">Получить все отзывы</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Магазин</th>
+                                <th>Название товара</th>
+                                <th>Рейтинг</th>
+                                <th>Текст отзыва</th>
+                                <th>Отзыв получен</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for review in reviews %}
+                                <tr>
+                                    <td>{{ review.store }}</td>
+                                    <td class="w-25 text-wrap">{{ review.product }}</td>
+                                    <td>{{ review.rating }}</td>
+                                    <td class="w-75 text-wrap text-sm">{{ review.content }}</td>
+                                    <td>{{ review.date_create }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

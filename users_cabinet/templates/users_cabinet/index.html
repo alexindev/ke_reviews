@@ -19,74 +19,72 @@
 </head>
 
 <body class="header-fixed">
-    <div class="page-body">
-        <div class="sidebar">
-            <div class="user-profile">
-                <div class="display-avatar animated-avatar">
-                    <img class="profile-img img-lg rounded-circle" src="{% if user.image %}
-                                                                            {{ user.image.url }}
-                                                                        {% else %}
-                                                                            #
-                                                                        {% endif %}"
-                         alt="profile image">
-                </div>
-                <div class="info-wrapper">
-                    <p class="user-name">Привет, {{ user }}!</p>
-                </div>
+<div class="page-body">
+    <div class="sidebar">
+        <div class="user-profile">
+            <div class="display-avatar animated-avatar">
+                <img class="profile-img img-lg rounded-circle" src="
+                    {% if user.image %}
+                        {{ user.image.url }}
+                    {% else %}
+                        #
+                    {% endif %}"
+                     alt="profile image">
             </div>
-            <ul class="navigation-menu">
-                <li>
-                    <a href="{% url 'users_cabinet:users_profile_url' %}">
-                        <span class="link-title">Дашборд</span>
-                        <i class="mdi mdi-gauge link-icon"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'users_cabinet:parser_url' %}">
-                        <span class="link-title">Парсер</span>
-                        <i class="mdi mdi-flask link-icon"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'users_cabinet:reviews_url' %}">
-                        <span class="link-title">Работа с отзывами</span>
-                        <i class="mdi mdi-comment-processing-outline link-icon"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'users_cabinet:profile_settings_url' %}">
-                        <span class="link-title">Настройки</span>
-                        <i class="mdi mdi-settings-outline link-icon"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'users_cabinet:logout_url' %}">
-                        <span class="link-title">Выйти</span>
-                        <i class="mdi mdi-logout-variant link-icon"></i>
-                    </a>
-                </li>
-            </ul>
-            <footer class="footer">
-                <div class="row">
-                    <div class="text-center text-sm-left mt-3 mt-sm-0">
-                        <small class="text-muted d-block">Copyright © 2023 <a
-                                href="https://github.com/alexindev/ke_services" target="_blank">Исходный код</a></small>
-                    </div>
-                </div>
-            </footer>
-        </div>
-
-        <div class="page-content-wrapper">
-            <div class="page-content-wrapper-inner">
-                <div class="content-viewport">
-                    {% block content %}{% endblock %}
-                </div>
+            <div class="info-wrapper">
+                <p class="user-name">Привет, {{ user }}!</p>
             </div>
         </div>
+        <ul class="navigation-menu">
+            <li>
+                <a href="{% url 'users_cabinet:users_profile_url' %}">
+                    <span class="link-title">Дашборд</span>
+                    <i class="mdi mdi-gauge link-icon"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'users_cabinet:parser_url' %}">
+                    <span class="link-title">Парсер</span>
+                    <i class="mdi mdi-flask link-icon"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'users_cabinet:reviews_url' %}">
+                    <span class="link-title">Работа с отзывами</span>
+                    <i class="mdi mdi-comment-processing-outline link-icon"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'users_cabinet:profile_settings_url' %}">
+                    <span class="link-title">Настройки</span>
+                    <i class="mdi mdi-settings-outline link-icon"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'users_cabinet:logout_url' %}">
+                    <span class="link-title">Выйти</span>
+                    <i class="mdi mdi-logout-variant link-icon"></i>
+                </a>
+            </li>
+        </ul>
+        <footer class="footer">
+            <div class="row">
+                <div class="text-center text-sm-left mt-3 mt-sm-0">
+                    <small class="text-muted d-block">Copyright © 2023 <a
+                            href="https://github.com/alexindev/ke_services" target="_blank">Исходный код</a></small>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <script src="{% static 'js/form.js' %}"></script>
-    <script src="{% static 'js/allert-close.js' %}"></script>
+    <div class="page-content-wrapper">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+<script src="{% static 'js/form.js' %}"></script>
+<script src="{% static 'js/allert-close.js' %}"></script>
 
 </body>
 

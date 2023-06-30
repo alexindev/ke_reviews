@@ -11,5 +11,5 @@ class UserStoresAdmin(admin.ModelAdmin):
 
 @admin.register(Reviews)
 class ReviewsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'store', 'product', 'text_review', 'rating']
+    list_display = ['user', 'store', 'product', 'content', 'rating', 'date_create']
 
