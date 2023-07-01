@@ -14,9 +14,7 @@ def get_reviews(token: str) -> list:
     work = True
 
     while work:
-        response = get_data(page, headers)
-
-        for data in response['payload']:
+        for data in get_data(page, headers)['payload']:
             timestamp_create = data['dateCreated'] / 1000
             review = {
                 'store': data['shop']['title'],
@@ -28,10 +26,9 @@ def get_reviews(token: str) -> list:
             }
             reviews_list.append(review)
             count_list.append(data)
-            page += 1
-
-            if len(count_list) % 100 != 0:
-                work = False
+        page += 1
+        if len(count_list) % 100 != 0:
+            work = False
     return reviews_list
 
 
