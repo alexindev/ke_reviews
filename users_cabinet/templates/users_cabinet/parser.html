@@ -11,33 +11,60 @@
             <div class="grid">
                 <div class="grid-body d-flex flex-column h-100">
                     <h5 class="mb-3">Блок парсера</h5>
-                    {% if not store_urls %}
-                        <p>Вы не добавили ни один магазин. Пожалуйста, добавьте магазины через настройки.</p>
-                    {% else %}
-                        <form method="get" action="{% url 'users_cabinet:parser_url' %}">
-                            <div class="form-row align-items-center">
-                                <div class="col-5">
-                                    <label for="store-select">Выберите магазин:</label>
-                                    <select class="form-control" id="store-select" name="store-select">
-                                        {% for url in store_urls %}
-                                            <option value="{{ url.store__store_url }}">{{ url.store__store_url }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-5">
-                                    <label for="period-select">Выберите период:</label>
-                                    <select class="form-control" id="period-select" name="period-select">
-                                        <option value="1">1 день</option>
-                                        <option value="3">3 дня</option>
-                                        <option value="7">7 дней</option>
-                                    </select>
-                                </div>
+                    <form method="get" action="{% url 'users_cabinet:parser_url' %}">
+                        <div class="form-row align-items-center">
+                            <div class="col-5">
+                                <label for="store-select">Выберите магазин:</label>
+                                <select class="form-control" id="store-select" name="store-select">
+                                    {% for obj in object_list %}
+                                        <option value="{{ obj.store }}">{{ obj.store }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="mt-3">
-                                <button type="submit" class="btn btn-primary">Применить</button>
+                            <div class="col-5">
+                                <label for="period-select">Выберите период (день):</label>
+                                <select class="form-control" id="period-select" name="period-select">
+                                    {% for day in period %}
+                                        <option value="{{ day }}">{{ day }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                        </form>
-                    {% endif %}
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Применить</button>
+                        </div>
+                    </form>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th>Цена</th>
+                                <th>Продано</th>
+                                <th>Остаток</th>
+                                <th>Ссылка</th>
+                                <th>Рейтинг</th>
+                                <th>Параметр1</th>
+                                <th>Параметр2</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in data %}
+                                <tr>
+                                    <td>{{ item.product }}</td>
+                                    <td>{{ item.price }}</td>
+                                    <td>{{ item.sold }}</td>
+                                    <td>{{ item.stock_balance }}</td>
+                                    <td>{{ item.url }}</td>
+                                    <td>{{ item.rating }}</td>
+                                    <td>{{ item.param1 }}</td>
+                                    <td>{{ item.param2 }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         </div>

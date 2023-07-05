@@ -7,14 +7,14 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from users.models import Users
-from .models import UserStores, Stores
+from datetime import date, timedelta
 
-from common.title import TitleMixin
+from .models import *
 from .forms import UserPicForm, UserDataForm, StoreForm
 
+from common.title import TitleMixin
+from users_cabinet.tasks import review_manager, parser_manager, new_token
 from .utils.stores import get_store
-from .tasks import new_token, parser_manager
 
 
 class ProfileView(TitleMixin, ListView):
@@ -74,25 +74,35 @@ class ParserView(TitleMixin, ListView):
     model = UserStores
     title = 'Парсер'
 
-    def get_queryset(self):
-        period = self.request.GET.get('period-select')
-        store = self.request.GET.get('store-select')
-        queryset = UserStores.objects.filter(user=self.request.user, store__store_url=store)
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['store_urls'] = UserStores.objects.filter(user=self.request.user).values('store__store_url')
+        context['period'] = range(1, 8)
+        store_url = self.request.GET.get('store-select')
+        period = int(self.request.GET.get('period-select', 1))
+
+        start_date = date.today() - timedelta(days=period)
+
+        context['data'] = UserStores.objects.filter(store__store_url=store_url, datetime__gte=start_date)
         return context
 
 
 class ReviewsView(TitleMixin, ListView):
     template_name = 'users_cabinet/reviews.html'
-    model = Users
     title = 'Отзывы'
+    model = Reviews
+    ordering = '-date_create'
+    paginate_by = 20
+
+    def post(self, request, *args, **kwargs):
+        user = Users.objects.get(id=request.user.pk)
+        token = user.token
+        user_pk = user.pk
+        review_manager.delay(token, user_pk)
+        return self.get(request, *args, **kwargs)
 
 
 class DeleteProfileView(RedirectView):
+
     url = reverse_lazy('users:auth_page_url')
 
     def post(self, request, *args, **kwargs):
