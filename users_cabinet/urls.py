@@ -12,6 +12,7 @@ urlpatterns = [
     path('reviews/', login_required(ReviewsView.as_view()), name='reviews_url'),
     path('logout/', UserLogoutView.as_view(), name='logout_url'),
     path('delete_profile/', DeleteProfileView.as_view(), name='delete_profile_url'),
-    path('settings/<int:store_id>', delete_store, name='delete_store_url'),
     path('get_token/', GetTokenView.as_view(), name='get_token_url'),
+    path('settings/<int:store_id>/', DeleteStoreView.as_view(), name='delete_store_url'),
+    path('settings/<str:action>/<int:store_id>/', ManagerStoreView.as_view(), name='manager_store_url'),
 ]

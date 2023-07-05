@@ -7,9 +7,9 @@ class StoresAdmin(admin.ModelAdmin):
 
 @admin.register(UserStores)
 class UserStoresAdmin(admin.ModelAdmin):
-    list_display = ['user', 'store', 'product', ]
+    list_display = ['store', 'product', 'price', 'stock_balance', 'url', 'rating', 'datetime']
 
 @admin.register(Reviews)
 class ReviewsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'store', 'product', 'text_review', 'rating']
+    list_display = ['user', 'store', 'product', 'content', 'rating', 'date_create']
 

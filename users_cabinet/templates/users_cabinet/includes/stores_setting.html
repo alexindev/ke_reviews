@@ -31,20 +31,22 @@
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
                 <h5 class="mb-2">Магазины</h5>
-                {% if store_urls %}
+                {% if stores %}
                     <p class="text-gray mb-2">Добавленные магазины для отслеживания:</p>
                     <ul>
-                        {% for store in store_urls %}
+                        {% for store in stores %}
                             <li>
-                                <a href="{{ store.id }}" class="delete-icon">
+                                <a href="{{ store.id }}">
                                     <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
                                 </a>
-                                {% if store.store__store_status %}
-                                    <i class="fa fa-pause fa-lg text-warning " aria-hidden="true"></i>
-                                {% else %}
-                                    <i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>
-                                {% endif %}
-                                {{ store.store__store_url }}
+                                <a href="{% url 'users_cabinet:manager_store_url' action=store.action store_id=store.id %}">
+                                    {% if store.action == "pause" %}
+                                        <i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>
+                                    {% endif %}
+                                </a>
+                                {{ store.store_url }}
                             </li>
                         {% endfor %}
                     </ul>

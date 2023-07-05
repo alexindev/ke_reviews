@@ -7,7 +7,7 @@ class UserStores(models.Model):
     store_name = models.CharField(max_length=50, null=True)
     product = models.CharField(max_length=200, null=True)
     price = models.PositiveIntegerField(default=0)
-    sale = models.PositiveIntegerField(default=0)
+    sold = models.PositiveIntegerField(default=0)
     stock_balance = models.PositiveIntegerField(null=True)
     url = models.CharField(max_length=100)
     rating = models.FloatField(null=True)
@@ -18,15 +18,15 @@ class UserStores(models.Model):
     store = models.ForeignKey('Stores', on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'магазин'
-        verbose_name_plural = 'Детализация по магазинам'
+        verbose_name = 'данные'
+        verbose_name_plural = 'Детализация по продажам'
 
     def __str__(self):
         return str(self.store)
 
 class Stores(models.Model):
     store_url = models.CharField(max_length=100, null=True, blank=True)
-    status = models.BooleanField(default=False)
+    action = models.CharField(max_length=5, default='play')
     users = models.ManyToManyField(Users, through='UserStores')
 
     class Meta:
@@ -40,8 +40,10 @@ class Stores(models.Model):
 class Reviews(models.Model):
     store = models.CharField(max_length=50)
     product = models.CharField(max_length=200)
-    text_review = models.TextField(blank=True)
-    rating = models.SmallIntegerField()
+    content = models.TextField(blank=True, null=True)
+    rating = models.PositiveSmallIntegerField(null=True)
+    review_id = models.PositiveIntegerField(null=True)
+    date_create = models.DateField(null=True)
     user = models.ForeignKey(to=Users, on_delete=models.CASCADE)
 
     class Meta:

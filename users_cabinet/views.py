@@ -1,22 +1,20 @@
-from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
+from django.views.generic.base import RedirectView
 from django.contrib.auth.views import LogoutView
-from django.contrib.auth import logout
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from datetime import datetime, timedelta
+from django.contrib.auth import logout
 from django.contrib import messages
+from django.urls import reverse_lazy
 
-from users.models import Users
-from .models import UserStores
+from datetime import date, timedelta
 
-from common.title import TitleMixin
+from .models import *
 from .forms import UserPicForm, UserDataForm, StoreForm
 
+from common.title import TitleMixin
+from users_cabinet.tasks import review_manager, parser_manager, new_token
 from .utils.stores import get_store
-from .tasks import new_token
 
 
 class ProfileView(TitleMixin, ListView):
@@ -37,8 +35,10 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         context['avatar_form'] = UserPicForm(instance=self.request.user)
         context['user_data_form'] = UserDataForm(instance=self.request.user)
         context['store_form'] = StoreForm()
-        store_urls = UserStores.objects.filter(user_id=self.request.user.pk).values('id', 'store__store_url')
-        context['store_urls'] = store_urls
+
+        store_urls = Stores.objects.filter(userstores__user=self.request.user).values('id', 'store_url', 'action')
+        context['stores'] = store_urls
+
         return context
 
     def form_valid(self, form):
@@ -74,45 +74,72 @@ class ParserView(TitleMixin, ListView):
     model = UserStores
     title = 'Парсер'
 
-    def get_queryset(self):
-        period = self.request.GET.get('period-select')
-        store = self.request.GET.get('store-select')
-        queryset = UserStores.objects.filter(user=self.request.user, store__store_url=store)
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['store_urls'] = UserStores.objects.filter(user=self.request.user).values('store__store_url')
+        context['period'] = range(1, 8)
+        store_url = self.request.GET.get('store-select')
+        period = int(self.request.GET.get('period-select', 1))
+
+        start_date = date.today() - timedelta(days=period)
+
+        context['data'] = UserStores.objects.filter(store__store_url=store_url, datetime__gte=start_date)
         return context
 
 
 class ReviewsView(TitleMixin, ListView):
     template_name = 'users_cabinet/reviews.html'
-    model = Users
     title = 'Отзывы'
+    model = Reviews
+    ordering = '-date_create'
+    paginate_by = 20
+
+    def post(self, request, *args, **kwargs):
+        user = Users.objects.get(id=request.user.pk)
+        token = user.token
+        user_pk = user.pk
+        review_manager.delay(token, user_pk)
+        return self.get(request, *args, **kwargs)
 
 
-class GetTokenView(View):
-    def post(self, request):
+class DeleteProfileView(RedirectView):
+
+    url = reverse_lazy('users:auth_page_url')
+
+    def post(self, request, *args, **kwargs):
+        self.request.user.delete()
+        logout(request)
+        return super().post(request, *args, **kwargs)
+
+
+class GetTokenView(RedirectView):
+    url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def post(self, request, *args, **kwargs):
         user = request.user
         login = user.login_ke
         password = user.pass_ke
         new_token.delay(login, password)
         messages.success(request, 'Получаем токен...')
-        return redirect('users_cabinet:profile_settings_url')
-
-
-class DeleteProfileView(View):
-    def post(self, request, *args, **kwargs):
-        self.request.user.delete()
-        logout(request)
-        return redirect(reverse_lazy('users:auth_page_url'))
+        return super().post(request, *args, **kwargs)
 
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('main_app:main_page_url')
 
 
-def delete_store(request, store_id):
-    UserStores.objects.filter(id=store_id).delete()
-    return redirect(reverse_lazy('users_cabinet:profile_settings_url'))
+class DeleteStoreView(RedirectView):
+    url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def get(self, request, *args, **kwargs):
+        Stores.objects.get(id=kwargs['store_id']).delete()
+        return super().get(request, *args, **kwargs)
+
+
+class ManagerStoreView(RedirectView):
+    url = reverse_lazy('users_cabinet:profile_settings_url')
+
+    def get(self, request, *args, **kwargs):
+        action = kwargs['action']
+        store_id = kwargs['store_id']
+        parser_manager.delay(action, store_id)
+        return super().get(self, request, *args, **kwargs)
