@@ -40,7 +40,7 @@ def get_market_id(market: str) -> int | None:
         return
 
 
-def get_product_data(market_id: int, offset: int, sort_by: str) -> dict:
+def get_products(market_id: int, offset: int, sort_by: str) -> dict:
     """Получить данные со страницы магазина"""
     headers = {
         'apollographql-client-name': 'web-customers',
@@ -62,18 +62,41 @@ def get_product_id(market: str) -> set | None:
     sort_by = 'BY_PRICE_ASC'
 
     if market_id:
-        data_items = get_product_data(market_id, offset, sort_by)
+        data_items = get_products(market_id, offset, sort_by)
         total_items = data_items['data']['makeSearch']['total']  # Получить суммарное количество товаров
         total_pages = (total_items + page_size - 1) // page_size  # Определить общее количество страниц
 
-        for page in range(1, total_pages+1):
+        for page in range(total_pages):
             if offset >= 10_000:
                 sort_by = 'BY_PRICE_DESC'
                 offset = 0
-            data = get_product_data(market_id, offset, sort_by)
+            data = get_products(market_id, offset, sort_by)
             offset += 100
             temp_set = {i['catalogCard']['productId'] for i in data['data']['makeSearch']['items']}
             product_id |= temp_set
         return product_id
 
 
+def get_product_data(product_id: int = 2097581):
+    url = f'https://api.kazanexpress.ru/api/v2/product/{product_id}'
+    r = requests.get(url).json()
+    data = r['payload']['data']
+    title = data['title']
+    rating = data['rating']
+    characteristics = data['characteristics']
+    skulist = data['skuList']
+
+    params_list = []
+
+    for i, param in enumerate(characteristics):
+        value_list = []
+        for j, value in enumerate(param['values']):
+            value_dict = {'index': j, 'title': value['title']}
+            value_list.append(value_dict)
+        param_dict = {i: param['title'], 'values': value_list}
+        params_list.append(param_dict)
+
+    print(params_list)
+
+
+get_product_data()
