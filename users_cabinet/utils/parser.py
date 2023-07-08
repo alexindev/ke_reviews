@@ -1,111 +1,132 @@
-import os
-
 import requests
-from dotenv import load_dotenv
+from loguru import logger
+from typing import Generator, Set, Tuple
 
+from config import headers, query
 
-load_dotenv()
+class ProductId:
+    def __init__(self, url: str):
+        self.market = url.split('/')[-1]
+        self.market_id = None
+        self.page_size = 100
+        self.offset = 0
+        self.product_id = set()
+        self.sort = 'BY_PRICE_ASC'
 
+    def get_market_id(self) -> int | None:
+        """Получить market_id"""
+        response = requests.get(f'https://api.kazanexpress.ru/api/shop/{self.market}').json()
+        try:
+            self.market_id = response['payload'].get('id')
+            return self.market_id
+        except AttributeError:
+            return
+        except TypeError:
+            return
 
-def get_json(market_id: int, offset: int, sort_by: str) -> dict:
-    return {
-        'operationName': 'getMakeSearch',
-        'variables': {
-            'queryInput': {
-                'categoryId': '1',
-                'shopId': market_id,
-                'showAdultContent': 'NONE',
-                'filters': [],
-                'sort': sort_by,
-                'pagination': {
-                    'offset': offset,
-                    'limit': 100,
+    def get_json(self) -> dict:
+        """Payload for json"""
+        return {
+            'operationName': 'getMakeSearch',
+            'variables': {
+                'queryInput': {
+                    'categoryId': '1',
+                    'shopId': self.market_id,
+                    'showAdultContent': 'NONE',
+                    'filters': [],
+                    'sort': self.sort,
+                    'pagination': {
+                        'offset': self.offset,
+                        'limit': 100,
+                    },
+                    'correctQuery': False,
+                    'getFastCategories': True,
                 },
-                'correctQuery': False,
-                'getFastCategories': True,
             },
-        },
-        'query': 'query getMakeSearch($queryInput: MakeSearchQueryInput!) {\n  makeSearch(query: $queryInput) {\n    id\n    queryId\n    queryText\n    category {\n      ...CategoryShortFragment\n      __typename\n    }\n    categoryTree {\n      category {\n        ...CategoryFragment\n        __typename\n      }\n      total\n      __typename\n    }\n    items {\n      catalogCard {\n        __typename\n        ...SkuGroupCardFragment\n      }\n      __typename\n    }\n    facets {\n      ...FacetFragment\n      __typename\n    }\n    total\n    mayHaveAdultContent\n    categoryFullMatch\n    offerCategory {\n      title\n      id\n      __typename\n    }\n    correctedQueryText\n    categoryWasPredicted\n    fastCategories {\n      category {\n        ...FastCategoryFragment\n        __typename\n      }\n      total\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment FacetFragment on Facet {\n  filter {\n    id\n    title\n    type\n    measurementUnit\n    description\n    __typename\n  }\n  buckets {\n    filterValue {\n      id\n      description\n      image\n      name\n      __typename\n    }\n    total\n    __typename\n  }\n  range {\n    min\n    max\n    __typename\n  }\n  __typename\n}\n\nfragment CategoryFragment on Category {\n  id\n  icon\n  parent {\n    id\n    __typename\n  }\n  seo {\n    header\n    metaTag\n    __typename\n  }\n  title\n  adult\n  __typename\n}\n\nfragment CategoryShortFragment on Category {\n  id\n  parent {\n    id\n    title\n    __typename\n  }\n  title\n  __typename\n}\n\nfragment FastCategoryFragment on Category {\n  id\n  parent {\n    id\n    title\n    __typename\n  }\n  title\n  seo {\n    header\n    metaTag\n    __typename\n  }\n  __typename\n}\n\nfragment SkuGroupCardFragment on SkuGroupCard {\n  ...DefaultCardFragment\n  photos {\n    key\n    link(trans: PRODUCT_540) {\n      high\n      low\n      __typename\n    }\n    previewLink: link(trans: PRODUCT_240) {\n      high\n      low\n      __typename\n    }\n    __typename\n  }\n  badges {\n    ... on BottomTextBadge {\n      backgroundColor\n      description\n      id\n      link\n      text\n      textColor\n      __typename\n    }\n    __typename\n  }\n  characteristicValues {\n    id\n    value\n    title\n    characteristic {\n      values {\n        id\n        title\n        value\n        __typename\n      }\n      title\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment DefaultCardFragment on CatalogCard {\n  adult\n  favorite\n  feedbackQuantity\n  id\n  minFullPrice\n  minSellPrice\n  offer {\n    due\n    icon\n    text\n    textColor\n    __typename\n  }\n  badges {\n    backgroundColor\n    text\n    textColor\n    __typename\n  }\n  ordersQuantity\n  productId\n  rating\n  title\n  __typename\n}',
-    }
+            'query': f'{query}'
+        }
 
+    def get_products(self) -> dict | None:
+        """Получить данные со страницы магазина"""
+        json_data = self.get_json()
+        try:
+            response = requests.post('https://graphql.kazanexpress.ru/', headers=headers, json=json_data).json()
+            return response
+        except Exception as e:
+            logger.error(e)
 
-def get_market_id(market: str) -> int | None:
-    """Получить market_id"""
-    response = requests.get(f'https://api.kazanexpress.ru/api/shop/{market}').json()
-    try:
-        return response['payload'].get('id')
-    except AttributeError:
-        return
-    except TypeError:
-        return
+    def get_product_id(self) -> Generator[Set, None, None]:
+        """Получить уникальные productId"""
+        market_id = self.get_market_id()
 
+        if market_id:
+            data_products = self.get_products()
+            if data_products:
 
-def get_products(market_id: int, offset: int, sort_by: str) -> dict:
-    """Получить данные со страницы магазина"""
-    headers = {
-        'apollographql-client-name': 'web-customers',
-        'content-type': 'application/json',
-        'x-iid': f'{os.getenv("X-IID")}',
-    }
+                total_items = data_products['data']['makeSearch']['total']  # Получить суммарное количество товаров
+                total_pages = (total_items + self.page_size - 1) // self.page_size  # Общее количество страниц
 
-    json_data = get_json(market_id, offset, sort_by)
-    response = requests.post('https://graphql.kazanexpress.ru/', headers=headers, json=json_data).json()
-    return response
+                for page in range(total_pages):
+                    if self.offset >= 10_000:
+                        self.sort = 'BY_PRICE_DESC'
+                        self.offset = 0
+                    data = self.get_products()
+                    self.offset += 100
+                    temp_set = {i['catalogCard']['productId'] for i in data['data']['makeSearch']['items']}
+                    products_id = temp_set - self.product_id  # Новые товары, не встречавшиеся ранее
+                    self.product_id.update(temp_set)  # Обновление множества с уже просмотренными товарами
+                    yield products_id
+            else:
+                logger.error('щшибка получения products')
+        else:
+            logger.error('ошибка получения marketId')
 
+class ProductData:
+    def __init__(self, product_id: int):
+        self.product_id = product_id
 
-def get_product_id(market: str) -> set | None:
-    """Получить уникальные productId"""
-    market_id = get_market_id(market)
-    product_id = set()
-    page_size = 100
-    offset = 0
-    sort_by = 'BY_PRICE_ASC'
+    def get_product_data(self) -> Generator[Tuple, None, None]:
+        """Генератор с данными для каждого SKU"""
+        data = self.fetch_product_data()
+        product = data['title']  # название продукта
+        characteristics = data['characteristics']  # может быть пустым
+        skulist = data['skuList']  # список SKU
+        param_list = self.get_param_list(characteristics)
 
-    if market_id:
-        data_items = get_products(market_id, offset, sort_by)
-        total_items = data_items['data']['makeSearch']['total']  # Получить суммарное количество товаров
-        total_pages = (total_items + page_size - 1) // page_size  # Определить общее количество страниц
+        for sku in skulist:
+            params_list = sku['characteristics']  # список параметров конкретного SKU
+            available_amount = sku['availableAmount']  # доступный остаток
+            price = sku['purchasePrice']  # цена
+            values = self.get_param_values(param_list, params_list)
 
-        for page in range(total_pages):
-            if offset >= 10_000:
-                sort_by = 'BY_PRICE_DESC'
-                offset = 0
-            data = get_products(market_id, offset, sort_by)
-            offset += 100
-            temp_set = {i['catalogCard']['productId'] for i in data['data']['makeSearch']['items']}
-            product_id |= temp_set
-        return product_id
+            yield product, price, available_amount, values
 
+    def fetch_product_data(self) -> dict:
+        """Получить респонсе"""
+        response = requests.get(f'https://api.kazanexpress.ru/api/v2/product/{self.product_id}').json()
+        return response['payload']['data']
 
-def get_product_data(product_id: int):
-    """Получить все возможные параметры"""
+    @staticmethod
+    def get_param_list(characteristics: dict) -> list:
+        """Список доступных параметров в карточке товара"""
+        param_list = []
+        if characteristics:
+            for i, param in enumerate(characteristics):
+                value_list = [value['title'] for value in param['values']]
+                param_dict = {'charIndex': i, 'title': param['title'], 'values': value_list}
+                param_list.append(param_dict)
+        return param_list
 
-    url = f'https://api.kazanexpress.ru/api/v2/product/{product_id}'
-    r = requests.get(url).json()
-    data = r['payload']['data']  # вся информация
-    product = data['title']  # название товара
-    characteristics = data['characteristics']  # может быть пустым
-    skulist = data['skuList']  # список SKU
-    param_list = []
-
-    if characteristics:
-        for i, param in enumerate(characteristics):
-            value_list = [value['title'] for value in param['values']]
-            param_dict = {'charIndex': i, 'title': param['title'], 'values': value_list}
-            param_list.append(param_dict)
-
-    for i in skulist:
-        params = i['characteristics']  # параметры внутри SKU
-        available_amount = i['availableAmount']
-        price = i['purchasePrice']
+    @staticmethod
+    def get_param_values(param_list, params_list) -> dict:
+        """Словарь с параметрами"""
         values = {}
         if param_list:
-            for param in params:
+            for param in params_list:
                 char_index = param['charIndex']  # индекс названия параметра
                 value_index = param['valueIndex']  # индекс параметра
                 current_param = param_list[char_index]  # параметры товара
                 value_title = current_param['title']  # название параметра
                 value_name = current_param['values'][value_index]  # значение параметра
                 values[value_title] = value_name  # параметры в словарь
-
-        yield product, price, available_amount, values
+        return values
