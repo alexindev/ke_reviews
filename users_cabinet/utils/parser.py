@@ -77,26 +77,35 @@ def get_product_id(market: str) -> set | None:
         return product_id
 
 
-def get_product_data(product_id: int = 2097581):
+def get_product_data(product_id: int):
+    """Получить все возможные параметры"""
+
     url = f'https://api.kazanexpress.ru/api/v2/product/{product_id}'
     r = requests.get(url).json()
-    data = r['payload']['data']
-    title = data['title']
-    rating = data['rating']
-    characteristics = data['characteristics']
-    skulist = data['skuList']
+    data = r['payload']['data']  # вся информация
+    product = data['title']  # название товара
+    characteristics = data['characteristics']  # может быть пустым
+    skulist = data['skuList']  # список SKU
+    param_list = []
 
-    params_list = []
+    if characteristics:
+        for i, param in enumerate(characteristics):
+            value_list = [value['title'] for value in param['values']]
+            param_dict = {'charIndex': i, 'title': param['title'], 'values': value_list}
+            param_list.append(param_dict)
 
-    for i, param in enumerate(characteristics):
-        value_list = []
-        for j, value in enumerate(param['values']):
-            value_dict = {'index': j, 'title': value['title']}
-            value_list.append(value_dict)
-        param_dict = {i: param['title'], 'values': value_list}
-        params_list.append(param_dict)
+    for i in skulist:
+        params = i['characteristics']  # параметры внутри SKU
+        available_amount = i['availableAmount']
+        price = i['purchasePrice']
+        values = {}
+        if param_list:
+            for param in params:
+                char_index = param['charIndex']  # индекс названия параметра
+                value_index = param['valueIndex']  # индекс параметра
+                current_param = param_list[char_index]  # параметры товара
+                value_title = current_param['title']  # название параметра
+                value_name = current_param['values'][value_index]  # значение параметра
+                values[value_title] = value_name  # параметры в словарь
 
-    print(params_list)
-
-
-get_product_data()
+        yield product, price, available_amount, values
