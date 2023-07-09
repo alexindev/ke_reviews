@@ -86,6 +86,7 @@ class ProductSKU:
         """Генератор с данными для каждого SKU"""
         data = self.fetch_product_data(product_id)
         product = data['title']  # название продукта
+        rating = data['rating']
         characteristics = data['characteristics']  # может быть пустым
         skulist = data['skuList']  # список SKU
         param_list = self.get_param_list(characteristics)
@@ -96,17 +97,17 @@ class ProductSKU:
             price = sku['purchasePrice']  # цена
             values = self.get_param_values(param_list, params_list)
 
-            yield product, price, available_amount, values
+            yield product, price, available_amount, rating, values
 
     @staticmethod
     def fetch_product_data(product_id: int) -> dict:
-        """Получить респонсе"""
+        """Получить данные всех sku для productId"""
         response = requests.get(f'https://api.kazanexpress.ru/api/v2/product/{product_id}').json()
         return response['payload']['data']
 
     @staticmethod
     def get_param_list(characteristics: dict) -> list:
-        """Список доступных параметров в карточке товара"""
+        """Список доступных параметров в productId"""
         param_list = []
         if characteristics:
             for i, param in enumerate(characteristics):
@@ -116,15 +117,14 @@ class ProductSKU:
         return param_list
 
     @staticmethod
-    def get_param_values(param_list, params_list) -> dict:
-        """Словарь с параметрами"""
-        values = {}
+    def get_param_values(param_list: list, params_list: list) -> list:
+        """Словарь с параметрами для каждого SKU"""
+        values = []
         if param_list:
             for param in params_list:
                 char_index = param['charIndex']  # индекс названия параметра
                 value_index = param['valueIndex']  # индекс параметра
-                current_param = param_list[char_index]  # параметры товара
-                value_title = current_param['title']  # название параметра
+                current_param: dict = param_list[char_index]  # параметры товара
                 value_name = current_param['values'][value_index]  # значение параметра
-                values[value_title] = value_name  # параметры в словарь
+                values.append(value_name)
         return values
