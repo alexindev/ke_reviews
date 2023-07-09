@@ -16,8 +16,8 @@
                             <div class="col-5">
                                 <label for="store-select">Выберите магазин:</label>
                                 <select class="form-control" id="store-select" name="store-select">
-                                    {% for obj in object_list %}
-                                        <option value="{{ obj.store }}">{{ obj.store }}</option>
+                                    {% for store in object_list %}
+                                        <option value="{{ store.store_url }}">{{ store.store_url }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
