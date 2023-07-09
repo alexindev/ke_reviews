@@ -27,7 +27,7 @@ class ProductData(models.Model):
 class Stores(models.Model):
     store_url = models.CharField(max_length=100, null=True, blank=True)
     action = models.CharField(max_length=5, default='play')
-    users = models.ManyToManyField(Users, through=ProductData, related_name='stores')
+    users = models.ManyToManyField(Users, through='ProductData', related_name='stores')
 
     class Meta:
         verbose_name = 'магазин'

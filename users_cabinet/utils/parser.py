@@ -2,7 +2,7 @@ import requests
 from loguru import logger
 from typing import Generator, Set, Tuple
 
-from config import headers, query
+from users_cabinet.utils.config import headers, query
 
 class ProductId:
     def __init__(self, url: str):
@@ -77,17 +77,14 @@ class ProductId:
                     self.product_id.update(temp_set)  # Обновление множества с уже просмотренными товарами
                     yield products_id
             else:
-                logger.error('щшибка получения products')
+                logger.error('ошибка получения products')
         else:
             logger.error('ошибка получения marketId')
 
-class ProductData:
-    def __init__(self, product_id: int):
-        self.product_id = product_id
-
-    def get_product_data(self) -> Generator[Tuple, None, None]:
+class ProductSKU:
+    def get_product_data(self, product_id: int) -> Generator[Tuple, None, None]:
         """Генератор с данными для каждого SKU"""
-        data = self.fetch_product_data()
+        data = self.fetch_product_data(product_id)
         product = data['title']  # название продукта
         characteristics = data['characteristics']  # может быть пустым
         skulist = data['skuList']  # список SKU
@@ -101,9 +98,10 @@ class ProductData:
 
             yield product, price, available_amount, values
 
-    def fetch_product_data(self) -> dict:
+    @staticmethod
+    def fetch_product_data(product_id: int) -> dict:
         """Получить респонсе"""
-        response = requests.get(f'https://api.kazanexpress.ru/api/v2/product/{self.product_id}').json()
+        response = requests.get(f'https://api.kazanexpress.ru/api/v2/product/{product_id}').json()
         return response['payload']['data']
 
     @staticmethod
