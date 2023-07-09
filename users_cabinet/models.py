@@ -3,7 +3,7 @@ from django.db import models
 from users.models import Users
 
 
-class UserStores(models.Model):
+class ProductData(models.Model):
     store_name = models.CharField(max_length=50, null=True)
     product = models.CharField(max_length=200, null=True)
     price = models.PositiveIntegerField(default=0)
@@ -27,7 +27,7 @@ class UserStores(models.Model):
 class Stores(models.Model):
     store_url = models.CharField(max_length=100, null=True, blank=True)
     action = models.CharField(max_length=5, default='play')
-    users = models.ManyToManyField(Users, through='UserStores')
+    users = models.ManyToManyField(Users, through=ProductData, related_name='stores')
 
     class Meta:
         verbose_name = 'магазин'
@@ -52,4 +52,3 @@ class Reviews(models.Model):
 
     def __str__(self):
         return self.product
-
