@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from users.models import Users
-from users_cabinet.models import *
+from users_cabinet.models import ProductData, Stores, Reviews
 
 from users_cabinet.utils.token import get_token
 from users_cabinet.utils.reviews import get_reviews
@@ -70,8 +70,10 @@ def parser(store_name: str, user_pk: str):
 
 
 @shared_task
-def parser_manager(action: str, store_id: str, token: str):
-    if action == 'play':
-        ...
+def parser_manager(status: bool, store_id: int):
+    store = Stores.objects.get(id=store_id)
+    if status:
+        store.status = False
     else:
-        ...
+        store.status = True
+    store.save()

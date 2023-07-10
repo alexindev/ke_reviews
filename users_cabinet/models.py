@@ -4,11 +4,11 @@ from users.models import Users
 
 
 class ProductData(models.Model):
-    product = models.CharField(max_length=200, null=True)
+    product = models.CharField(max_length=200)
     price = models.PositiveIntegerField(default=0)
     stock_balance = models.PositiveIntegerField(null=True)
     url = models.CharField(max_length=100)
-    rating = models.FloatField(null=True, blank=True)
+    rating = models.FloatField(null=True)
     param1 = models.CharField(max_length=50, null=True)
     param2 = models.CharField(max_length=50, null=True)
     datetime = models.DateField(auto_now_add=True)
@@ -23,9 +23,9 @@ class ProductData(models.Model):
         return str(self.product)
 
 class Stores(models.Model):
-    store_name = models.CharField(max_length=50, null=True, blank=True)
-    store_url = models.CharField(max_length=100, null=True, blank=True)
-    action = models.CharField(max_length=5, default='play')
+    store_name = models.CharField(max_length=50)
+    store_url = models.CharField(max_length=100)
+    status = models.BooleanField(default=False)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
 
     class Meta:
@@ -33,16 +33,16 @@ class Stores(models.Model):
         verbose_name_plural = 'Все магазины'
 
     def __str__(self):
-        return self.store_name
+        return str(self.store_name)
 
 
 class Reviews(models.Model):
     store = models.CharField(max_length=50)
     product = models.CharField(max_length=200)
-    content = models.TextField(blank=True, null=True)
+    content = models.TextField(null=True)
     rating = models.PositiveSmallIntegerField(null=True)
-    review_id = models.PositiveIntegerField(null=True)
-    date_create = models.DateField(null=True)
+    review_id = models.PositiveIntegerField()
+    date_create = models.DateField()
     user = models.ForeignKey(to=Users, on_delete=models.CASCADE)
 
     class Meta:
@@ -50,4 +50,4 @@ class Reviews(models.Model):
         verbose_name_plural = 'Отзывы'
 
     def __str__(self):
-        return self.product
+        return str(self.product)
