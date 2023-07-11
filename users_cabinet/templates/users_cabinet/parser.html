@@ -16,8 +16,10 @@
                             <div class="col-5">
                                 <label for="store-select">Выберите магазин:</label>
                                 <select class="form-control" id="store-select" name="store-select">
-                                    {% for store in object_list %}
-                                        <option value="{{ store.store_url }}">{{ store.store_url }}</option>
+                                    <option value="" {% if not selected_store %}selected{% endif %}>Все</option>
+                                    {% for store in store_data %}
+                                        <option value="{{ store.store_name }}"
+                                                {% if selected_store == store.store_name %}selected{% endif %}>{{ store.store_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -40,7 +42,6 @@
                             <tr>
                                 <th>Товар</th>
                                 <th>Цена</th>
-                                <th>Продано</th>
                                 <th>Остаток</th>
                                 <th>Ссылка</th>
                                 <th>Рейтинг</th>
@@ -49,22 +50,65 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for item in data %}
+                            {% for item in object_list %}
                                 <tr>
-                                    <td>{{ item.product }}</td>
+                                    <td class="w-25 text-wrap">{{ item.product }}</td>
                                     <td>{{ item.price }}</td>
-                                    <td>{{ item.sold }}</td>
                                     <td>{{ item.stock_balance }}</td>
-                                    <td>{{ item.url }}</td>
-                                    <td>{{ item.rating }}</td>
-                                    <td>{{ item.param1 }}</td>
-                                    <td>{{ item.param2 }}</td>
+                                    <td class="w-25 text-wrap">{{ item.url }}</td>
+                                    <td>{% if item.rating %}{{ item.rating }}{% endif %}</td>
+                                    <td>{% if item.param1 %}{{ item.param1 }}{% endif %}</td>
+                                    <td>{% if item.param2 %}{{ item.param2 }}{% endif %}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                    {% if is_paginated %}
+                        <div class="pagination mt-5 align-self-center">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page=1">&laquo;
+                                            первая</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ page_obj.previous_page_number }}"><
+                                            Previous</a>
+                                    </li>
+                                {% endif %}
 
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if num == page_obj.number %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num <= page_obj.number|add:'2' and num >= page_obj.number|add:'-2' %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ page_obj.next_page_number }}">Next
+                                            ></a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ page_obj.paginator.num_pages }}">Last
+                                            >></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                    {% endif %}
                 </div>
             </div>
         </div>

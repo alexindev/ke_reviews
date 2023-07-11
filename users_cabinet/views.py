@@ -9,12 +9,13 @@ from django.urls import reverse_lazy
 
 from datetime import date, timedelta
 
-from .models import *
-from .forms import UserPicForm, UserDataForm, StoreForm
+from users.models import Users
+from users_cabinet.models import ProductData, Stores, Reviews
+from users_cabinet.forms import UserPicForm, UserDataForm, StoreForm
 
 from common.title import TitleMixin
-from users_cabinet.tasks import review_manager, parser_manager, new_token
-from .utils.stores import get_store
+from users_cabinet.tasks import new_token, review_manager, parser_manager
+from users_cabinet.utils.stores import get_store
 
 
 class ProfileView(TitleMixin, ListView):
@@ -35,10 +36,7 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
         context['avatar_form'] = UserPicForm(instance=self.request.user)
         context['user_data_form'] = UserDataForm(instance=self.request.user)
         context['store_form'] = StoreForm()
-
-        store_urls = Stores.objects.filter(userstores__user=self.request.user).values('id', 'store_url', 'action')
-        context['stores'] = store_urls
-
+        context['stores'] = Stores.objects.filter(user=self.request.user.pk)
         return context
 
     def form_valid(self, form):
@@ -56,10 +54,10 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
             store_form = StoreForm(self.request.POST)
             if store_form.is_valid():
                 store_url = store_form.cleaned_data['store_url']
-                if not UserStores.objects.filter(user=self.request.user, store__store_url=store_url).exists():
+                store_name = store_url.split('/')[-1]
+                if not Stores.objects.filter(user=self.request.user, store_url=store_url).exists():
                     if get_store(store_url):
-                        store = store_form.save()
-                        UserStores.objects.create(store=store, user=self.request.user)
+                        Stores.objects.create(store_url=store_url, store_name=store_name, user=self.request.user)
                     else:
                         form.add_error('store_url', 'Некорректная ссылка или магазина не существует')
                         return super().form_invalid(form)
@@ -71,18 +69,22 @@ class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
 
 class ParserView(TitleMixin, ListView):
     template_name = 'users_cabinet/parser.html'
-    model = UserStores
     title = 'Парсер'
+    model = ProductData
+    paginate_by = 40
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        selected_store = self.request.GET.get('store-select')
+        if selected_store:  # Если выбран магазин
+            queryset = queryset.filter(store__store_name=selected_store)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['selected_store'] = self.request.GET.get('store-select')
         context['period'] = range(1, 8)
-        store_url = self.request.GET.get('store-select')
-        period = int(self.request.GET.get('period-select', 1))
-
-        start_date = date.today() - timedelta(days=period)
-
-        context['data'] = UserStores.objects.filter(store__store_url=store_url, datetime__gte=start_date)
+        context['store_data'] = Stores.objects.filter(user__username=self.request.user)
         return context
 
 
@@ -92,6 +94,20 @@ class ReviewsView(TitleMixin, ListView):
     model = Reviews
     ordering = '-date_create'
     paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = Users.objects.get(id=self.request.user.pk)
+
+        if not user.token:
+            context['token_message'] = 'Необходимо добавить данные для авторизации в настройках'
+        elif user.token_valid is False:
+            context['token_message'] = 'Необходимо заменить токен авторизации в настройках'
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        return queryset
 
     def post(self, request, *args, **kwargs):
         user = Users.objects.get(id=request.user.pk)
@@ -139,7 +155,7 @@ class ManagerStoreView(RedirectView):
     url = reverse_lazy('users_cabinet:profile_settings_url')
 
     def get(self, request, *args, **kwargs):
-        action = kwargs['action']
+        status = True if kwargs['action'] == 'True' else False
         store_id = kwargs['store_id']
-        parser_manager.delay(action, store_id)
+        parser_manager.delay(status, store_id)
         return super().get(self, request, *args, **kwargs)
