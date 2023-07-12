@@ -6,6 +6,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.utils import timezone
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
@@ -74,16 +75,20 @@ class ParserView(TitleMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         selected_store = self.request.GET.get('store-select')
+        select_period = int(self.request.GET.get('period-select', 1))
+        time_delta = timezone.now() - timezone.timedelta(days=select_period)
         if not selected_store:  # Если не выбран магазин
-            queryset = queryset.filter(store__user__username=self.request.user)
+            queryset = queryset.filter(store__user__username=self.request.user, datetime__lte=time_delta)
         elif selected_store:  # Если выбран магазин
-            queryset = queryset.filter(store__store_name=selected_store, user__username=self.request.user)
+            queryset = queryset.filter(store__store_name=selected_store, user__username=self.request.user,
+                                       datetime__lte=time_delta)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['selected_store'] = self.request.GET.get('store-select')
-        context['period'] = range(1, 8)
+        context['time_interval'] = [i for i in range(1, 8)]
+        context['period'] = int(self.request.GET.get('period-select', 1))
         context['store_data'] = Stores.objects.filter(user__username=self.request.user)
         return context
 
