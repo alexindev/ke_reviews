@@ -16,10 +16,11 @@
                             <div class="col-5">
                                 <label for="store-select">Выберите магазин:</label>
                                 <select class="form-control" id="store-select" name="store-select">
-                                    <option value="" {% if not selected_store %}selected{% endif %}>Все</option>
+                                    <option value="">Все</option>
                                     {% for store in store_data %}
                                         <option value="{{ store.store_name }}"
-                                                {% if selected_store == store.store_name %}selected{% endif %}>{{ store.store_name }}</option>
+                                                {% if selected_store == store.store_name %}selected{% endif %}>
+                                            {{ store.store_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -69,17 +70,15 @@
                             <ul class="pagination justify-content-center">
                                 {% if page_obj.has_previous %}
                                     <li class="page-item">
-                                        <a class="page-link"
-                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page=1">&laquo;
-                                            первая</a>
+                                        <a class="page-link" href="?store-select={% if selected_store %}{{ selected_store }}{% endif %}&period-select={{ period }}&page=1"><< Первая
+                                        </a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link"
-                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ page_obj.previous_page_number }}"><
-                                            Previous</a>
+                                        <a class="page-link" href="?store-select={% if selected_store %}{{ selected_store }}{% endif %}&period-select={{ period }}&page={{ page_obj.previous_page_number }}">
+                                            < Предыдущая
+                                        </a>
                                     </li>
                                 {% endif %}
-
                                 {% for num in page_obj.paginator.page_range %}
                                     {% if num == page_obj.number %}
                                         <li class="page-item active">
@@ -87,34 +86,30 @@
                                         </li>
                                     {% elif num <= page_obj.number|add:'2' and num >= page_obj.number|add:'-2' %}
                                         <li class="page-item">
-                                            <a class="page-link"
-                                               href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ num }}">{{ num }}</a>
+                                            <a class="page-link" href="?store-select={% if selected_store %}{{ selected_store }}{% endif %}&period-select={{ period }}&page={{ num }}">
+                                                {{ num }}
+                                            </a>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
-
                                 {% if page_obj.has_next %}
                                     <li class="page-item">
-                                        <a class="page-link"
-                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ page_obj.next_page_number }}">Next
-                                            ></a>
+                                        <a class="page-link" href="?store-select={% if selected_store %}{{ selected_store }}{% endif %}&period-select={{ period }}&page={{ page_obj.next_page_number }}">
+                                            Следующая >
+                                        </a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link"
-                                           href="?store-select={{ selected_store }}&period-select={{ period }}&page={{ page_obj.paginator.num_pages }}">Last
-                                            >></a>
+                                        <a class="page-link" href="?store-select={% if selected_store %}{{ selected_store }}{% endif %}&period-select={{ period }}&page={{ page_obj.paginator.num_pages }}">
+                                            Последняя >>
+                                        </a>
                                     </li>
                                 {% endif %}
                             </ul>
                         </div>
-
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-
-
-
 
 {% endblock %}
