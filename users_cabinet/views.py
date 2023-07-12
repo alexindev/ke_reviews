@@ -7,14 +7,12 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from datetime import date, timedelta
-
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
 from users_cabinet.forms import UserPicForm, UserDataForm, StoreForm
 
 from common.title import TitleMixin
-from users_cabinet.tasks import new_token, review_manager, parser_manager
+from users_cabinet.tasks import new_token, get_reviews, parser_manager
 from users_cabinet.utils.stores import get_store
 
 
@@ -76,8 +74,10 @@ class ParserView(TitleMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         selected_store = self.request.GET.get('store-select')
-        if selected_store:  # Если выбран магазин
-            queryset = queryset.filter(store__store_name=selected_store)
+        if not selected_store:  # Если не выбран магазин
+            queryset = queryset.filter(store__user__username=self.request.user)
+        elif selected_store:  # Если выбран магазин
+            queryset = queryset.filter(store__store_name=selected_store, user__username=self.request.user)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -113,7 +113,7 @@ class ReviewsView(TitleMixin, ListView):
         user = Users.objects.get(id=request.user.pk)
         token = user.token
         user_pk = user.pk
-        review_manager.delay(token, user_pk)
+        get_reviews.delay(token, user_pk)
         return self.get(request, *args, **kwargs)
 
 

@@ -2,7 +2,7 @@ import datetime
 import requests
 
 
-def get_reviews(token: str) -> list:
+def get_review(token: str) -> list:
     headers = {
         'accept': 'application/json',
         'authorization': f'Bearer {token}',
