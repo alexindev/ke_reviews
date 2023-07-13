@@ -4,6 +4,7 @@ from users.models import Users
 
 
 class ProductData(models.Model):
+    sku_id = models.PositiveIntegerField(unique=True)
     product = models.CharField(max_length=200)
     price = models.PositiveIntegerField(default=0)
     stock_balance = models.PositiveIntegerField(null=True)
@@ -16,11 +17,25 @@ class ProductData(models.Model):
     store = models.ForeignKey('Stores', on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'данные'
-        verbose_name_plural = 'Детализация по продажам'
+        verbose_name = 'SKU'
+        verbose_name_plural = 'Все SKU'
 
     def __str__(self):
         return str(self.product)
+
+
+class SalesData(models.Model):
+    sku = models.ForeignKey(ProductData, on_delete=models.CASCADE)
+    sales_1 = models.PositiveSmallIntegerField(null=True)
+    sales_2 = models.PositiveSmallIntegerField(null=True)
+    sales_3 = models.PositiveSmallIntegerField(null=True)
+    sales_4 = models.PositiveSmallIntegerField(null=True)
+    sales_5 = models.PositiveSmallIntegerField(null=True)
+    sales_6 = models.PositiveSmallIntegerField(null=True)
+    sales_7 = models.PositiveSmallIntegerField(null=True)
+
+    def __str__(self):
+        return str(self.sku)
 
 class Stores(models.Model):
     store_name = models.CharField(max_length=50)
