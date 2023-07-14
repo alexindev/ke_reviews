@@ -1,15 +1,17 @@
 from celery import shared_task
+from django.utils import timezone
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
 
 from users_cabinet.utils.token import get_token
-from users_cabinet.utils.reviews import get_reviews
+from users_cabinet.utils.reviews import get_review
 from users_cabinet.utils.parser import ProductId, ProductSKU
 
 
 @shared_task
 def new_token(login: str, password: str) -> str | None:
+    """Новый jwt токен для отзывов"""
     token = get_token(login, password)
     user = Users.objects.get(login_ke=login)
     if token:
@@ -22,8 +24,9 @@ def new_token(login: str, password: str) -> str | None:
 
 
 @shared_task
-def review_manager(token, user_pk) -> bool:
-    reviews = get_reviews(token)
+def get_reviews(token, user_pk) -> bool:
+    """Получить отзывы"""
+    reviews = get_review(token)
     user = Users.objects.get(pk=user_pk)
     if reviews:
         for review in reviews:
@@ -44,6 +47,7 @@ def review_manager(token, user_pk) -> bool:
 
 @shared_task
 def daily_parser():
+    """Ежедневный сбор данных"""
     urls = Stores.objects.filter(status=True)
     for url in urls:
         product_ids = ProductId(url.store_url)
@@ -71,9 +75,18 @@ def daily_parser():
 
 @shared_task
 def parser_manager(status: bool, store_id: int):
+    """Переключение статуса магазинов для парсинга"""
     store = Stores.objects.get(id=store_id)
     if status:
         store.status = False
     else:
         store.status = True
     store.save()
+
+
+@shared_task
+def delete_old_data():
+    """Удалить старые записи старше 7 дней"""
+    data = ProductData.objects.filter(datetime__lte=timezone.now()-timezone.timedelta(days=7))
+    data.delete()
+
