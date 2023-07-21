@@ -14,5 +14,6 @@ urlpatterns = [
     path('delete_profile/', DeleteProfileView.as_view(), name='delete_profile_url'),
     path('get_token/', GetTokenView.as_view(), name='get_token_url'),
     path('settings/<int:store_id>/', DeleteStoreView.as_view(), name='delete_store_url'),
-    path('settings/<int:store_id>/<str:action>/', ManagerStoreView.as_view(), name='manager_store_url'),
+    path('settings/api/v1/stores/<int:store_id>/', UpdateStoreStatusView.as_view(), name='update_store_status_url'),
+
 ]

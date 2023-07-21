@@ -76,8 +76,7 @@ def daily_parser():
 
 @shared_task
 def update_sales_data():
-
-    # Список с датами на 7 дней сегодняшнего дня
+    """Обновление данных о продажах"""
     date_list = [timezone.now() - timedelta(days=i) for i in range(7)]
 
     sku_id_list = ProductData.objects.values('sku_id').distinct()
@@ -96,17 +95,6 @@ def update_sales_data():
                     current_sales = stock_balance - current_stock_balance
                     setattr(sales_data, f'sales_{num + 1}', current_sales)
             sales_data.save()
-
-
-@shared_task
-def parser_manager(status: bool, store_id: int):
-    """Переключение статуса магазинов для парсинга"""
-    store = Stores.objects.get(id=store_id)
-    if status:
-        store.status = False
-    else:
-        store.status = True
-    store.save()
 
 
 @shared_task

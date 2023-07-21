@@ -8,12 +8,15 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils import timezone
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
 from users_cabinet.forms import UserPicForm, UserDataForm, StoreForm
 
 from common.title import TitleMixin
-from users_cabinet.tasks import new_token, get_reviews, parser_manager
+from users_cabinet.tasks import new_token, get_reviews
 from users_cabinet.utils.stores import get_store
 
 
@@ -86,9 +89,9 @@ class ParserView(TitleMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['period'] = int(self.request.GET.get('period-select', 1))
         context['selected_store'] = self.request.GET.get('store-select')
         context['time_interval'] = [i for i in range(1, 8)]
-        context['period'] = int(self.request.GET.get('period-select', 1))
         context['store_data'] = Stores.objects.filter(user__username=self.request.user)
         return context
 
@@ -156,11 +159,12 @@ class DeleteStoreView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class ManagerStoreView(RedirectView):
-    url = reverse_lazy('users_cabinet:profile_settings_url')
-
-    def get(self, request, *args, **kwargs):
-        status = True if kwargs['action'] == 'True' else False
-        store_id = kwargs['store_id']
-        parser_manager.delay(status, store_id)
-        return super().get(self, request, *args, **kwargs)
+class UpdateStoreStatusView(APIView):
+    def post(self, request, store_id):
+        store_id = store_id
+        store_status = request.data.get('store_status')
+        store_status = False if store_status == 'True' else True
+        store = Stores.objects.get(id=store_id)
+        store.status = store_status
+        store.save()
+        return Response({'store_status': f'{store_status}'})
