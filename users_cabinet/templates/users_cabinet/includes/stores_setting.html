@@ -39,7 +39,8 @@
                                 <a href="{{ store.id }}">
                                     <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
                                 </a>
-                                <a href="{% url 'users_cabinet:manager_store_url' store_id=store.id action=store.status %}">
+                                <a href="#" data-store-id="{{ store.id }}" data-store-status="{{ store.status }}"
+                                   class="store-status">
                                     {% if store.status %}
                                         <i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>
                                     {% else %}
@@ -57,3 +58,47 @@
         </div>
     </div>
 </div>
+
+<script>
+    function updateStoreStatus(storeId, newStatus) {
+        const storeElement = document.querySelector(`[data-store-id="${storeId}"]`);
+
+        storeElement.innerHTML = newStatus === 'True'
+            ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
+            : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>'
+
+        storeElement.dataset.storeStatus = newStatus === 'True' ? 'True':'False'
+    }
+
+    const storeElements = document.querySelectorAll('.store-status');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    storeElements.forEach((element) => {
+        element.addEventListener('click', function (e) {
+            e.preventDefault();
+            const storeId = element.dataset.storeId;
+            const storeStatus = element.dataset.storeStatus;
+            const url = `api/v1/stores/${storeId}/`;
+            fetch(
+                url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify(
+                        {
+                            store_status: storeStatus,
+                        }
+                    ),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    updateStoreStatus(storeId, data.store_status);
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+        });
+    });
+</script>
