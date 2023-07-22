@@ -1,5 +1,5 @@
 """
-ASGI config for ke_service main_app.
+ASGI config for ke_service start_page.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

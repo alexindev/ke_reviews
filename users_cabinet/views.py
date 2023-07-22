@@ -81,10 +81,10 @@ class ParserView(TitleMixin, ListView):
         select_period = int(self.request.GET.get('period-select', 1))
         time_delta = timezone.now() - timezone.timedelta(days=select_period)
         if not selected_store:  # Если не выбран магазин
-            queryset = queryset.filter(store__user__username=self.request.user, datetime__lte=time_delta)
+            queryset = queryset.filter(store__user__username=self.request.user, datetime__gte=time_delta)
         elif selected_store:  # Если выбран магазин
             queryset = queryset.filter(store__store_name=selected_store, user__username=self.request.user,
-                                       datetime__lte=time_delta)
+                                       datetime__gte=time_delta)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -148,7 +148,7 @@ class GetTokenView(RedirectView):
 
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy('main_app:main_page_url')
+    next_page = reverse_lazy('start_page:main_page_url')
 
 
 class DeleteStoreView(RedirectView):
