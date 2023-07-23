@@ -1,7 +1,6 @@
 from django import forms
 
 from users.models import Users
-from .models import Stores
 
 
 class UserPicForm(forms.ModelForm):
@@ -22,16 +21,4 @@ class UserDataForm(forms.ModelForm):
                                                'placeholder': 'Введите email или номер телефона'}),
             'pass_ke': forms.PasswordInput(attrs={'class': 'form-control',
                                                   'placeholder': 'Введите пароль'})
-        }
-
-
-class StoreForm(forms.ModelForm):
-    class Meta:
-        model = Stores
-        fields = ['store_url']
-        widgets = {
-            'store_url': forms.URLInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ссылка на магазин',
-            })
         }

@@ -1,5 +1,4 @@
 from django.views.generic.list import ListView
-from django.views.generic.edit import FormView
 from django.views.generic.base import RedirectView
 from django.contrib.auth.views import LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -13,7 +12,7 @@ from rest_framework.response import Response
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
-from users_cabinet.forms import UserPicForm, UserDataForm, StoreForm
+from users_cabinet.forms import UserPicForm, UserDataForm
 
 from common.title import TitleMixin
 from users_cabinet.tasks import new_token, get_reviews
@@ -26,47 +25,33 @@ class ProfileView(TitleMixin, ListView):
     title = 'Главное меню'
 
 
-class SettingsView(TitleMixin, SuccessMessageMixin, FormView):
+class SettingsView(TitleMixin, SuccessMessageMixin, ListView):
     template_name = 'users_cabinet/settings.html'
     title = 'Настройки'
-    form_class = StoreForm
+    model = Stores
     success_message = 'Данные обновлены'
     success_url = reverse_lazy('users_cabinet:profile_settings_url')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['avatar_form'] = UserPicForm(instance=self.request.user)
-        context['user_data_form'] = UserDataForm(instance=self.request.user)
-        context['store_form'] = StoreForm()
-        context['stores'] = Stores.objects.filter(user=self.request.user.pk)
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['avatar_form'] = UserPicForm(instance=self.request.user)
+    #     context['user_data_form'] = UserDataForm(instance=self.request.user)
+    #     # context['store_form'] = StoreForm()
+    #     context['stores'] = Stores.objects.filter(user=self.request.user.pk)
+    #     return context
 
-    def form_valid(self, form):
-        if 'avatar_btn' in self.request.POST:
-            avatar_form = UserPicForm(self.request.POST, self.request.FILES, instance=self.request.user)
-            if avatar_form.is_valid():
-                avatar_form.save()
+    # def form_valid(self, form):
+    #     if 'avatar_btn' in self.request.POST:
+    #         avatar_form = UserPicForm(self.request.POST, self.request.FILES, instance=self.request.user)
+    #         if avatar_form.is_valid():
+    #             avatar_form.save()
+    #
+    #     elif 'user_data_btn' in self.request.POST:
+    #         user_data_form = UserDataForm(self.request.POST, instance=self.request.user)
+    #         if user_data_form.is_valid():
+    #             user_data_form.save()
 
-        elif 'user_data_btn' in self.request.POST:
-            user_data_form = UserDataForm(self.request.POST, instance=self.request.user)
-            if user_data_form.is_valid():
-                user_data_form.save()
-
-        elif 'store_btn' in self.request.POST:
-            store_form = StoreForm(self.request.POST)
-            if store_form.is_valid():
-                store_url = store_form.cleaned_data['store_url']
-                store_name = store_url.split('/')[-1]
-                if not Stores.objects.filter(user=self.request.user, store_url=store_url).exists():
-                    if get_store(store_url):
-                        Stores.objects.create(store_url=store_url, store_name=store_name, user=self.request.user)
-                    else:
-                        form.add_error('store_url', 'Некорректная ссылка или магазина не существует')
-                        return super().form_invalid(form)
-                else:
-                    form.add_error('store_url', 'Магазина уже добавлен')
-                    return super().form_invalid(form)
-        return super().form_valid(form)
+    #     return super().form_valid(form)
 
 
 class ParserView(TitleMixin, ListView):
@@ -160,11 +145,28 @@ class DeleteStoreView(RedirectView):
 
 
 class UpdateStoreStatusView(APIView):
-    def post(self, request, store_id):
-        store_id = store_id
+    """Обновить статус магазина"""
+    def put(self, request, store_id):
         store_status = request.data.get('store_status')
         store_status = False if store_status == 'True' else True
         store = Stores.objects.get(id=store_id)
         store.status = store_status
         store.save()
         return Response({'store_status': f'{store_status}'})
+
+
+class NewStoreView(APIView):
+    """Добавить новый магазин"""
+    def post(self, request):
+        store_url: str = request.data.get('new_store').strip()
+        store_name = store_url.split('/')[-1]
+
+        if not Stores.objects.filter(user=request.user, store_url=store_url).exists():
+            if get_store(store_url):
+                Stores.objects.create(store_url=store_url, store_name=store_name, user=request.user)
+                return Response({'message': f'Магазин {store_name} успешно добавлен', 'status': True})
+            else:
+                return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
+        else:
+            return Response({'message': f'Магазин {store_name} уже добавлен', 'status': False})
+
