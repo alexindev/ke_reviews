@@ -1,6 +1,5 @@
 {% extends 'users_cabinet/index.html' %}
 
-
 {{ title }}
 
 {% block content %}
@@ -10,30 +9,13 @@
             <p class="text-gray">Панель управления</p>
         </div>
     </div>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        {% endfor %}
-    {% endif %}
 
-
-    {% if form.errors %}
-        <div class="alert alert-danger">
-            {% for field_errors in form.errors.values %}
-                {% for error in field_errors %}
-                    {{ error }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div id="message-alert" class="alert alert-dismissible fade show" role="alert" style="display: none">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <span id="message-text"></span>
+    </div>
 
     {% include 'users_cabinet/includes/stores_setting.html' %}
     {% include 'users_cabinet/includes/reviews_setting.html' %}

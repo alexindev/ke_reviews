@@ -92,12 +92,12 @@ class ProductSKU:
         param_list = self.get_param_list(characteristics)
 
         for sku in skulist:
+            sku_id: int = sku['id']  # уникальный идентификатор
             params_list = sku['characteristics']  # список параметров конкретного SKU
             available_amount = sku['availableAmount']  # доступный остаток
             price = sku['purchasePrice']  # цена
             values = self.get_param_values(param_list, params_list)
-
-            yield product, price, available_amount, rating, values
+            yield sku_id, product, price, available_amount, rating, values
 
     @staticmethod
     def fetch_product_data(product_id: int) -> dict:

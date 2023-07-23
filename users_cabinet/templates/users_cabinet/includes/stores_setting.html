@@ -10,18 +10,17 @@
                     </span>
                 </p>
                 <form method="post" enctype="multipart/form-data"
-                      action="{% url 'users_cabinet:profile_settings_url' %}">
+                      id="new-store">
                     {% csrf_token %}
-                    <div class="row row-showcase-row-area mb-3">
-                        <div class="col-12">
-                            {{ store_form.store_url }}
+                    <div class="row row-showcase-row-area mb-3 col-12">
+                        <div class="input-group">
+                            <label for="store-url" class="sr-only">Ссылка на магазин</label>
+                            <input type="url" class="form-control" id="store-url" placeholder="Ссылка на магазин">
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <button class="btn btn-outline-primary" type="submit" name="store_btn">Добавить
-                            </button>
-                        </div>
+                    <div class="row mt-3 col-12">
+                        <button class="btn btn-outline-primary" type="submit" name="store-btn">Добавить
+                        </button>
                     </div>
                 </form>
             </div>
@@ -31,15 +30,16 @@
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
                 <h5 class="mb-2">Магазины</h5>
-                {% if stores %}
+                {% if object_list %}
                     <p class="text-gray mb-2">Добавленные магазины для отслеживания:</p>
                     <ul>
-                        {% for store in stores %}
+                        {% for store in object_list %}
                             <li>
                                 <a href="{{ store.id }}">
                                     <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
                                 </a>
-                                <a href="{% url 'users_cabinet:manager_store_url' store_id=store.id action=store.status %}">
+                                <a href="#" data-store-id="{{ store.id }}" data-store-status="{{ store.status }}"
+                                   class="store-status">
                                     {% if store.status %}
                                         <i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>
                                     {% else %}
@@ -57,3 +57,4 @@
         </div>
     </div>
 </div>
+

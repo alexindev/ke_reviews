@@ -3,8 +3,8 @@ from django.views.generic.base import TemplateView
 from common.title import TitleMixin
 
 
-class MainPageView(TitleMixin, TemplateView):
-    template_name = 'main_app/index.html'
+class StartPageView(TitleMixin, TemplateView):
+    template_name = 'start_page/index.html'
     title = 'Главная страница'
 
 

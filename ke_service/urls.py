@@ -15,13 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from main_app.views import page_not_found
+from start_page.views import page_not_found
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main_app.urls', namespace='main_app')),
+    path('', include('start_page.urls', namespace='start_page')),
     path('users/', include('users.urls', namespace='users')),
     path('profile/', include('users_cabinet.urls', namespace='users_cabinet'))
 ]
