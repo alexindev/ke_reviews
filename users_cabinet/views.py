@@ -118,19 +118,24 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy('start_page:main_page_url')
 
 
-class DeleteStoreView(RedirectView):
-    url = reverse_lazy('users_cabinet:profile_settings_url')
-
-    def get(self, request, *args, **kwargs):
-        Stores.objects.get(id=kwargs['store_id']).delete()
-        return super().get(request, *args, **kwargs)
+class DeleteStoreView(APIView):
+    """Удалить магазин"""
+    def delete(self, request):
+        store_id = request.data.get('store_id')
+        store = Stores.objects.get(id=store_id)
+        if store:
+            store.delete()
+            return Response({'message': f'Магазин {store} удален', 'status': True})
+        else:
+            return Response({'message': 'Магазин не найден', 'status': False})
 
 
 class UpdateStoreStatusView(APIView):
     """Обновить статус магазина"""
-    def put(self, request, store_id):
+    def put(self, request):
+        store_id = request.data.get('store_id')
         store_status = request.data.get('store_status')
-        if store_status:
+        if store_id and store_status:
             store_status = False if store_status == 'True' else True
             store = Stores.objects.get(id=store_id)
             store.status = store_status
