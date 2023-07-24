@@ -32,26 +32,17 @@ class SettingsView(TitleMixin, SuccessMessageMixin, ListView):
     success_message = 'Данные обновлены'
     success_url = reverse_lazy('users_cabinet:profile_settings_url')
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['avatar_form'] = UserPicForm(instance=self.request.user)
-    #     context['user_data_form'] = UserDataForm(instance=self.request.user)
-    #     # context['store_form'] = StoreForm()
-    #     context['stores'] = Stores.objects.filter(user=self.request.user.pk)
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stores'] = Stores.objects.filter(user=self.request.user.pk)
+        context['avatar_form'] = UserPicForm(instance=self.request.user)
+        return context
 
     # def form_valid(self, form):
     #     if 'avatar_btn' in self.request.POST:
     #         avatar_form = UserPicForm(self.request.POST, self.request.FILES, instance=self.request.user)
     #         if avatar_form.is_valid():
     #             avatar_form.save()
-    #
-    #     elif 'user_data_btn' in self.request.POST:
-    #         user_data_form = UserDataForm(self.request.POST, instance=self.request.user)
-    #         if user_data_form.is_valid():
-    #             user_data_form.save()
-
-    #     return super().form_valid(form)
 
 
 class ParserView(TitleMixin, ListView):
@@ -169,4 +160,22 @@ class NewStoreView(APIView):
                 return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
         else:
             return Response({'message': f'Магазин {store_name} уже добавлен', 'status': False})
+
+
+class ReviewDataView(APIView):
+    """Добавить/обновить данные учетной записи для отзывов"""
+    def put(self, request):
+        login = request.data.get('login')
+        password = request.data.get('password')
+        user_data, created = Users.objects.update_or_create(
+            id=request.user.pk,
+            defaults={
+                'login_ke': login,
+                'pass_ke': password
+            }
+        )
+        if created:
+            return Response({'message': 'Учетная запись добавлена', 'status': True})
+        else:
+            return Response({'message': 'Данные учетной записи обновлены', 'status': True})
 
