@@ -12,7 +12,6 @@ from rest_framework.response import Response
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
-from users_cabinet.forms import UserPicForm, UserDataForm
 
 from common.title import TitleMixin
 from users_cabinet.tasks import new_token, get_reviews
@@ -32,26 +31,10 @@ class SettingsView(TitleMixin, SuccessMessageMixin, ListView):
     success_message = 'Данные обновлены'
     success_url = reverse_lazy('users_cabinet:profile_settings_url')
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['avatar_form'] = UserPicForm(instance=self.request.user)
-    #     context['user_data_form'] = UserDataForm(instance=self.request.user)
-    #     # context['store_form'] = StoreForm()
-    #     context['stores'] = Stores.objects.filter(user=self.request.user.pk)
-    #     return context
-
-    # def form_valid(self, form):
-    #     if 'avatar_btn' in self.request.POST:
-    #         avatar_form = UserPicForm(self.request.POST, self.request.FILES, instance=self.request.user)
-    #         if avatar_form.is_valid():
-    #             avatar_form.save()
-    #
-    #     elif 'user_data_btn' in self.request.POST:
-    #         user_data_form = UserDataForm(self.request.POST, instance=self.request.user)
-    #         if user_data_form.is_valid():
-    #             user_data_form.save()
-
-    #     return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stores'] = Stores.objects.filter(user=self.request.user.pk)
+        return context
 
 
 class ParserView(TitleMixin, ListView):
@@ -111,7 +94,6 @@ class ReviewsView(TitleMixin, ListView):
 
 
 class DeleteProfileView(RedirectView):
-
     url = reverse_lazy('users:auth_page_url')
 
     def post(self, request, *args, **kwargs):
@@ -169,4 +151,38 @@ class NewStoreView(APIView):
                 return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
         else:
             return Response({'message': f'Магазин {store_name} уже добавлен', 'status': False})
+
+
+class ReviewDataView(APIView):
+    """Добавить/обновить данные учетной записи для отзывов"""
+    def put(self, request):
+        login = request.data.get('login')
+        password = request.data.get('password')
+        user_data, created = Users.objects.update_or_create(
+            id=request.user.pk,
+            defaults={
+                'login_ke': login,
+                'pass_ke': password
+            }
+        )
+        if created:
+            return Response({'message': 'Учетная запись добавлена', 'status': True})
+        else:
+            return Response({'message': 'Данные учетной записи обновлены', 'status': True})
+
+
+class UserPicView(APIView):
+    """Добавить/изменить аватар пользователя"""
+    def post(self, request):
+        picture = request.data.get('picture')
+        user_data, created = Users.objects.update_or_create(
+            id=request.user.pk,
+            defaults={
+                'image': picture
+            }
+        )
+        if created:
+            return Response({'message': 'Аватар добавлен', 'status': True})
+        else:
+            return Response({'message': 'Аватар обновлен обновлены', 'status': True})
 

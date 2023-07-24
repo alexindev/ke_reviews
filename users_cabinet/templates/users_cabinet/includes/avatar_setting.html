@@ -3,29 +3,24 @@
         <div class="grid">
             <div class="grid-body d-flex flex-column h-100">
                 <h5 class="mb-2">Обновить аватар</h5>
-                <p class="text-gray mb-2">Загрузить изображение профиля</p>
-                <form method="post" enctype="multipart/form-data"
-                      action="{% url 'users_cabinet:profile_settings_url' %}">
+                <p class="text-gray mb-2">Загрузить изображение профиля
+                <span class="tooltip-icon" title="JPEG или PNG">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </span>
+                </p>
+                <form method="post" enctype="multipart/form-data" id="avatar-form">
                     {% csrf_token %}
                     <div class="row row-showcase-row-area mb-3">
                         <div class="col-12 mb-2">
                             <div class="custom-file">
-                                {{ avatar_form.image }}
-                                <label class="custom-file-label" for="{{ avatart_form.image.id_for_label }}">
-                                    {% if user.image %}
-                                        {{ user.image.name|cut:'user_pic/'|truncatechars:30 }}
-                                    {% else %}
-                                        Выберите изображение
-                                    {% endif %}
-                                </label>
+                                <input type="file" class="custom-file-input" id="avatar-input"
+                                       accept="image/jpeg, image/png" name="image" required>
+                                <label class="custom-file-label" for="avatar-input">Выберите изображение</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <button class="btn btn-outline-primary" type="submit" name="avatar_btn">Обновить
-                            </button>
-                        </div>
+                    <div class="row col-12">
+                        <button class="btn btn-outline-primary" type="submit" name="avatar_btn">Обновить</button>
                     </div>
                 </form>
             </div>
