@@ -130,11 +130,14 @@ class UpdateStoreStatusView(APIView):
     """Обновить статус магазина"""
     def put(self, request, store_id):
         store_status = request.data.get('store_status')
-        store_status = False if store_status == 'True' else True
-        store = Stores.objects.get(id=store_id)
-        store.status = store_status
-        store.save()
-        return Response({'store_status': f'{store_status}'})
+        if store_status:
+            store_status = False if store_status == 'True' else True
+            store = Stores.objects.get(id=store_id)
+            store.status = store_status
+            store.save()
+            return Response({'store_status': f'{store_status}'})
+        else:
+            return Response({'message': 'Не корректное переключение статуса', 'status': False})
 
 
 class NewStoreView(APIView):
@@ -142,15 +145,17 @@ class NewStoreView(APIView):
     def post(self, request):
         store_url: str = request.data.get('new_store').strip()
         store_name = store_url.split('/')[-1]
-
-        if not Stores.objects.filter(user=request.user, store_url=store_url).exists():
-            if get_store(store_url):
-                Stores.objects.create(store_url=store_url, store_name=store_name, user=request.user)
-                return Response({'message': f'Магазин {store_name} успешно добавлен', 'status': True})
+        if store_url:
+            if not Stores.objects.filter(user=request.user, store_url=store_url).exists():
+                if get_store(store_url):
+                    Stores.objects.create(store_url=store_url, store_name=store_name, user=request.user)
+                    return Response({'message': f'Магазин {store_name} успешно добавлен', 'status': True})
+                else:
+                    return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
             else:
-                return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
+                return Response({'message': f'Магазин {store_name} уже добавлен', 'status': False})
         else:
-            return Response({'message': f'Магазин {store_name} уже добавлен', 'status': False})
+            return Response({'message': 'Введите ссылку на магазин', 'status': False})
 
 
 class ReviewDataView(APIView):
@@ -158,31 +163,36 @@ class ReviewDataView(APIView):
     def put(self, request):
         login = request.data.get('login')
         password = request.data.get('password')
-        user_data, created = Users.objects.update_or_create(
-            id=request.user.pk,
-            defaults={
-                'login_ke': login,
-                'pass_ke': password
-            }
-        )
-        if created:
-            return Response({'message': 'Учетная запись добавлена', 'status': True})
+        if login and password:
+            user_data, created = Users.objects.update_or_create(
+                id=request.user.pk,
+                defaults={
+                    'login_ke': login,
+                    'pass_ke': password
+                }
+            )
+            if created:
+                return Response({'message': 'Учетная запись добавлена', 'status': True})
+            else:
+                return Response({'message': 'Данные учетной записи обновлены', 'status': True})
         else:
-            return Response({'message': 'Данные учетной записи обновлены', 'status': True})
-
+            return Response({'message': 'Необходимо заполнить все поля', 'status': False})
 
 class UserPicView(APIView):
     """Добавить/изменить аватар пользователя"""
     def post(self, request):
         picture = request.data.get('picture')
-        user_data, created = Users.objects.update_or_create(
-            id=request.user.pk,
-            defaults={
-                'image': picture
-            }
-        )
-        if created:
-            return Response({'message': 'Аватар добавлен', 'status': True})
+        if picture:
+            user_data, created = Users.objects.update_or_create(
+                id=request.user.pk,
+                defaults={
+                    'image': picture
+                }
+            )
+            if created:
+                return Response({'message': 'Аватар добавлен', 'status': True})
+            else:
+                return Response({'message': 'Аватар обновлен обновлены', 'status': True})
         else:
-            return Response({'message': 'Аватар обновлен обновлены', 'status': True})
+            return Response({'message': 'Добавьте изображение', 'status': False})
 

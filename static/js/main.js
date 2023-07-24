@@ -54,7 +54,11 @@ storeElements.forEach((element) => {
             })
             .then(response => response.json())
             .then(data => {
-                updateStoreStatus(storeId, data.store_status);
+                if (!('message' in data)) {
+                    updateStoreStatus(storeId, data.store_status);
+                } else {
+                    messageAlert(data.message, data.status)
+                }
             })
             .catch(error => {
                     console.error('Ошибка смены статуса:', error);
