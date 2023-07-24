@@ -12,7 +12,6 @@ from rest_framework.response import Response
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
-from users_cabinet.forms import UserPicForm, UserDataForm
 
 from common.title import TitleMixin
 from users_cabinet.tasks import new_token, get_reviews
@@ -35,14 +34,7 @@ class SettingsView(TitleMixin, SuccessMessageMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['stores'] = Stores.objects.filter(user=self.request.user.pk)
-        context['avatar_form'] = UserPicForm(instance=self.request.user)
         return context
-
-    # def form_valid(self, form):
-    #     if 'avatar_btn' in self.request.POST:
-    #         avatar_form = UserPicForm(self.request.POST, self.request.FILES, instance=self.request.user)
-    #         if avatar_form.is_valid():
-    #             avatar_form.save()
 
 
 class ParserView(TitleMixin, ListView):
@@ -102,7 +94,6 @@ class ReviewsView(TitleMixin, ListView):
 
 
 class DeleteProfileView(RedirectView):
-
     url = reverse_lazy('users:auth_page_url')
 
     def post(self, request, *args, **kwargs):
@@ -178,4 +169,20 @@ class ReviewDataView(APIView):
             return Response({'message': 'Учетная запись добавлена', 'status': True})
         else:
             return Response({'message': 'Данные учетной записи обновлены', 'status': True})
+
+
+class UserPicView(APIView):
+    """Добавить/изменить аватар пользователя"""
+    def post(self, request):
+        picture = request.data.get('picture')
+        user_data, created = Users.objects.update_or_create(
+            id=request.user.pk,
+            defaults={
+                'image': picture
+            }
+        )
+        if created:
+            return Response({'message': 'Аватар добавлен', 'status': True})
+        else:
+            return Response({'message': 'Аватар обновлен обновлены', 'status': True})
 
