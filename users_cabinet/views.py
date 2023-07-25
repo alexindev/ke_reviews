@@ -122,12 +122,15 @@ class DeleteStoreView(APIView):
     """Удалить магазин"""
     def delete(self, request):
         store_id = request.data.get('store_id')
-        store = Stores.objects.get(id=store_id)
-        if store:
-            store.delete()
-            return Response({'message': f'Магазин {store} удален', 'status': True})
+        if store_id:
+            store = Stores.objects.get(id=store_id)
+            if store:
+                store.delete()
+                return Response({'message': f'Магазин {store} удален', 'status': True})
+            else:
+                return Response({'message': 'Магазин не найден', 'status': False})
         else:
-            return Response({'message': 'Магазин не найден', 'status': False})
+            return Response({'message': 'Ошибка удаления магазина', 'status': False})
 
 
 class UpdateStoreStatusView(APIView):

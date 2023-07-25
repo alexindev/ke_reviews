@@ -30,23 +30,24 @@
                 <h5 class="mb-2">Магазины</h5>
                 {% if object_list %}
                     <p class="text-gray mb-2">Добавленные магазины для отслеживания:</p>
-                    {% for store in stores %}
-                        <div class="store-items" data-store-id="{{ store.id }}">
-                            <a href="#" class="store-delete" data-action="store-delete" >
-                                <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
-                            </a>
-                            <a href="#" class="store-status" data-action="store-status"
-                               data-store-status="{{ store.status }}">
-                                {% if store.status %}
-                                    <i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>
-                                {% else %}
-                                    <i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>
-                                {% endif %}
-                            </a>
-                            {{ store.store_url }}
-                        </div>
-                    {% endfor %}
-
+                    <div class="stores-container">
+                        {% for store in stores %}
+                            <div class="store-items" data-store-id="{{ store.id }}">
+                                <a href="#" class="store-delete" data-action="store-delete" >
+                                    <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
+                                </a>
+                                <a href="#" class="store-status" data-action="store-status"
+                                   data-store-status="{{ store.status }}">
+                                    {% if store.status %}
+                                        <i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>
+                                    {% endif %}
+                                </a>
+                                {{ store.store_url }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% else %}
                     <p class="text-gray">Ни одного магазина не добавлено</p>
                 {% endif %}
