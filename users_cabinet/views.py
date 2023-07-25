@@ -143,7 +143,7 @@ class UpdateStoreStatusView(APIView):
             store = Stores.objects.get(id=store_id)
             store.status = store_status
             store.save()
-            return Response({'store_status': f'{store_status}'})
+            return Response({'message': f'{store_status}', 'status': True})
         else:
             return Response({'message': 'Не корректное переключение статуса', 'status': False})
 
@@ -156,8 +156,8 @@ class NewStoreView(APIView):
         if store_url:
             if not Stores.objects.filter(user=request.user, store_url=store_url).exists():
                 if get_store(store_url):
-                    Stores.objects.create(store_url=store_url, store_name=store_name, user=request.user)
-                    return Response({'message': f'Магазин {store_name} успешно добавлен', 'status': True})
+                    store = Stores.objects.create(store_url=store_url, store_name=store_name, user=request.user)
+                    return Response({'message': f'Магазин {store_name} успешно добавлен', 'store_id': store.id, 'status': True})
                 else:
                     return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
             else:
@@ -200,7 +200,7 @@ class UserPicView(APIView):
             if created:
                 return Response({'message': 'Аватар добавлен', 'status': True})
             else:
-                return Response({'message': 'Аватар обновлен обновлены', 'status': True})
+                return Response({'message': 'Аватар обновлен', 'status': True})
         else:
             return Response({'message': 'Добавьте изображение', 'status': False})
 
