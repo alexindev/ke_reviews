@@ -11,10 +11,11 @@
             Личный кабинет
         {% endif %}
     </title>
-    <link rel="stylesheet" href="{% static 'vendors/iconfonts/mdi/css/materialdesignicons.css' %}">
     <link rel="stylesheet" href="{% static 'css/shared/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/demo/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+          integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+          crossorigin="anonymous">
     <link rel="shortcut icon" href="{% static 'img/icon.ico' %}" type="images/x-icon"/>
 </head>
 
@@ -39,31 +40,31 @@
             <li>
                 <a href="{% url 'users_cabinet:users_profile_url' %}">
                     <span class="link-title">Дашборд</span>
-                    <i class="mdi mdi-gauge link-icon"></i>
+                    <i class="fas fa-chart-line mr-2"></i>
                 </a>
             </li>
             <li>
                 <a href="{% url 'users_cabinet:parser_url' %}">
                     <span class="link-title">Парсер</span>
-                    <i class="mdi mdi-flask link-icon"></i>
+                    <i class="fas fa-flask mr-2"></i>
                 </a>
             </li>
             <li>
                 <a href="{% url 'users_cabinet:reviews_url' %}">
                     <span class="link-title">Работа с отзывами</span>
-                    <i class="mdi mdi-comment-processing-outline link-icon"></i>
+                    <i class="far fa-comments mr-2"></i>
                 </a>
             </li>
             <li>
                 <a href="{% url 'users_cabinet:profile_settings_url' %}">
                     <span class="link-title">Настройки</span>
-                    <i class="mdi mdi-settings-outline link-icon"></i>
+                    <i class="fas fa-tools mr-2"></i>
                 </a>
             </li>
             <li>
                 <a href="{% url 'users_cabinet:logout_url' %}">
                     <span class="link-title">Выйти</span>
-                    <i class="mdi mdi-logout-variant link-icon"></i>
+                    <i class="fas fa-door-open mr-2"></i>
                 </a>
             </li>
         </ul>
@@ -84,6 +85,7 @@
 </div>
 
 <script src="{% static 'js/main.js' %}"></script>
+<script src="https://use.fontawesome.com/4c12b49614.js"></script>
 
 </body>
 
