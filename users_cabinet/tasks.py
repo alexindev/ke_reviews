@@ -12,7 +12,7 @@ from users_cabinet.utils.parser import ProductId, ProductSKU
 
 @shared_task
 def new_token(login: str, password: str) -> str | None:
-    """Новый jwt токен для отзывов"""
+    """Новый токен для отзывов"""
     token = get_token(login, password)
     user = Users.objects.get(login_ke=login)
     if token:

@@ -3,7 +3,7 @@ from .models import Stores, ProductData, Reviews, SalesData
 
 @admin.register(Stores)
 class StoresAdmin(admin.ModelAdmin):
-    list_display = ['store_name', 'store_url', 'status']
+    list_display = ['store_name', 'id', 'store_url', 'status']
 
 @admin.register(ProductData)
 class ProductDataAdmin(admin.ModelAdmin):
