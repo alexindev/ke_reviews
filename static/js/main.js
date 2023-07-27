@@ -1,12 +1,6 @@
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 const closeButton = document.querySelector('.alert .close');
-const newStoreForm = document.querySelector('#new-store');
-const reviewForm = document.querySelector('#review-data');
 const messageAlertElem = document.querySelector('.alert');
-const avatarForm = document.querySelector('#avatar-form');
-const avatarInput = document.querySelector('#avatar-input');
-
-
-document.querySelector('.stores-container').addEventListener('click', handleStoreItemClick);
 
 
 // Закрыть информационное окно с собщениями
@@ -36,7 +30,6 @@ function updateStoreStatus(storeElement, storeId, newStatus) {
 
 // Отправка и получение запроса
 function fetchData(url, method, contentType, bodyData) {
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     const headers = {
         'X-CSRFToken': csrfToken,
     };
@@ -110,24 +103,31 @@ function handleStoreItemClick(event) {
 }
 
 
-// Добавить новый магазин
-newStoreForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const newStoreInput = document.querySelector('#store-url')
-    const newStoreValue = newStoreInput.value
-    const url = 'api/v1/new_store/'
-    const bodyData = JSON.stringify(
-        {
-            new_store: newStoreValue
-        }
-    )
-    fetchData(url, 'POST', 'application/json', bodyData)
-        .then(data => {
-            if (data.status) {
-                const newStoreItem = document.createElement('div');
-                newStoreItem.classList.add('store-items');
-                newStoreItem.setAttribute('data-store-id', data.store_id);
-                newStoreItem.innerHTML = `
+if (window.location.pathname === '/profile/settings/') {
+
+    // Блок со всеми магазинами в настройках
+    document.querySelector('.stores-container').addEventListener('click', handleStoreItemClick);
+
+
+    // Добавить новый магазин
+    const newStoreForm = document.querySelector('#new-store');
+    newStoreForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const newStoreInput = document.querySelector('#store-url')
+        const newStoreValue = newStoreInput.value
+        const url = 'api/v1/new_store/'
+        const bodyData = JSON.stringify(
+            {
+                new_store: newStoreValue
+            }
+        )
+        fetchData(url, 'POST', 'application/json', bodyData)
+            .then(data => {
+                if (data.status) {
+                    const newStoreItem = document.createElement('div');
+                    newStoreItem.classList.add('store-items');
+                    newStoreItem.setAttribute('data-store-id', data.store_id);
+                    newStoreItem.innerHTML = `
                     <a href="#" class="store-delete" data-action="store-delete">
                         <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
                     </a>
@@ -137,65 +137,128 @@ newStoreForm.addEventListener('submit', function (e) {
                     ${newStoreValue}
                 `;
 
-                const storesContainer = document.querySelector('.stores-container');
-                storesContainer.appendChild(newStoreItem);
-                // storeItems = document.querySelectorAll('.store-items');
-                // console.log(storeItems)
+                    const storesContainer = document.querySelector('.stores-container');
+                    storesContainer.appendChild(newStoreItem);
+                    // storeItems = document.querySelectorAll('.store-items');
+                    // console.log(storeItems)
+                }
+                messageAlert(data.message, data.status)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    });
+
+
+    // Форма получения данных для отзывов
+    const reviewForm = document.querySelector('#review-data');
+    reviewForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const reviewLogin = document.querySelector('#review-login').value
+        const reviewPassword = document.querySelector('#review-password').value
+        const url = 'api/v1/review/'
+        const bodyData = JSON.stringify(
+            {
+                login: reviewLogin,
+                password: reviewPassword
             }
-            messageAlert(data.message, data.status)
-        })
-        .catch(error => {
-            console.log(error)
-        })
-});
+        )
+        fetchData(url, 'PUT', 'application/json', bodyData)
+            .then(data => {
+                messageAlert(data.message, data.status)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    });
 
 
-// Форма получения данных для отзывов
-reviewForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const reviewLogin = document.querySelector('#review-login').value
-    const reviewPassword = document.querySelector('#review-password').value
-    const url = 'api/v1/review/'
-    const bodyData = JSON.stringify(
-        {
-            login: reviewLogin,
-            password: reviewPassword
-        }
-    )
-    fetchData(url, 'PUT', 'application/json', bodyData)
+    // Добавить/изменить аватар пользователя
+    const avatarForm = document.querySelector('#avatar-form');
+    avatarForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const url = 'api/v1/avatar/'
+        const userPicture = document.querySelector('#avatar-input')
+        const formData = new FormData();
+        formData.append('picture', userPicture.files[0]);
+        fetchData(url, 'POST', '', formData)
+            .then(data => {
+                if (data.status) {
+                    const profileIMG = document.querySelector('.profile-img');
+                    profileIMG.src = URL.createObjectURL(formData.get('picture'));
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    });
+
+
+    // Название картинки в поле input
+    const avatarInput = document.querySelector('#avatar-input');
+    avatarInput.addEventListener('change', function () {
+        const file = avatarInput.files[0];
+        const fileName = file.name;
+        const labelElement = document.querySelector('label[for="avatar-input"]');
+        labelElement.textContent = fileName.slice(0, 30) + '...';
+    });
+}
+
+
+if (window.location.pathname === '/profile/reviews/') {
+    // При загрузке страницы сразу загружаем первую страницу отзывов
+    loadPage('api/v1/get_reviews/');
+
+    // Кнопка обновить отзывы
+    const updateReviewsBtn = document.querySelector('#update-reviews')
+
+    updateReviewsBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('api/v1/update_reviews/')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+            })
+
+    })
+}
+
+function renderReviewsTable(data) {
+    const reviewsTable = document.querySelector('.table');
+    reviewsTable.innerHTML = `
+      <thead>
+        <tr>
+          <th>Магазин</th>
+          <th>Название товара</th>
+          <th>Рейтинг</th>
+          <th>Текст отзыва</th>
+          <th>Отзыв получен</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.results.map(review => `
+          <tr>
+            <td>${review.store}</td>
+            <td class="w-25 text-wrap">${review.product}</td>
+            <td>${review.rating}</td>
+            <td class="w-75 text-wrap text-sm">${review.content}</td>
+            <td>${review.date_create}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+}
+
+
+// Функция для загрузки данных и отображения таблицы и пагинации
+function loadPage(url) {
+    fetch(url)
+        .then(response => response.json())
         .then(data => {
-            messageAlert(data.message, data.status)
+            renderReviewsTable(data);
         })
         .catch(error => {
-            console.log(error)
-        })
-});
+            console.error('Ошибка при получении данных:', error);
+        });
+}
 
-
-// Добавить/изменить аватар пользователя
-avatarForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const url = 'api/v1/avatar/'
-    const userPicture = document.querySelector('#avatar-input')
-    const formData = new FormData();
-    formData.append('picture', userPicture.files[0]);
-    fetchData(url, 'POST', '', formData)
-        .then(data => {
-            if (data.status) {
-                const profileIMG = document.querySelector('.profile-img');
-                profileIMG.src = URL.createObjectURL(formData.get('picture'));
-            }
-        })
-        .catch(error => {
-            console.log(error)
-        })
-});
-
-
-// Название картинки в поле input
-avatarInput.addEventListener('change', function () {
-    const file = avatarInput.files[0];
-    const fileName = file.name;
-    const labelElement = document.querySelector('label[for="avatar-input"]');
-    labelElement.textContent = fileName.slice(0, 30) + '...';
-});

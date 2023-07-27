@@ -17,6 +17,7 @@ def new_token(login: str, password: str) -> str | None:
     user = Users.objects.get(login_ke=login)
     if token:
         user.login_valid = True
+        user.token_valid = True
         user.token = token
     else:
         user.login_valid = False
@@ -25,7 +26,7 @@ def new_token(login: str, password: str) -> str | None:
 
 
 @shared_task
-def get_reviews(token, user_pk) -> bool:
+def get_reviews(token: str, user_pk: int) -> bool:
     """Получить отзывы"""
     reviews = get_review(token)
     user = Users.objects.get(pk=user_pk)
@@ -43,6 +44,8 @@ def get_reviews(token, user_pk) -> bool:
                 }
             )
         return True
+    user.token_valid = False
+    user.save()
     return False
 
 
@@ -60,7 +63,6 @@ def daily_parser():
                     sku_id, product_name, price, available, rating, params = sku_tuple[:6]
                     param1 = params[0] if params else None
                     param2 = params[1] if len(params) > 1 else None
-
                     ProductData.objects.create(
                         sku_id=sku_id,
                         product=product_name,

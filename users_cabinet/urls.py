@@ -13,11 +13,12 @@ urlpatterns = [
     path('logout/', UserLogoutView.as_view(), name='logout_url'),
     path('delete_profile/', DeleteProfileView.as_view(), name='delete_profile_url'),
     path('get_token/', GetTokenView.as_view(), name='get_token_url'),
-    path('settings/<int:store_id>/', DeleteStoreView.as_view(), name='delete_store_url'),
     path('settings/api/v1/store_status/', UpdateStoreStatusView.as_view()),
     path('settings/api/v1/new_store/', NewStoreView.as_view()),
     path('settings/api/v1/review/', ReviewDataView.as_view()),
     path('settings/api/v1/avatar/', UserPicView.as_view()),
     path('settings/api/v1/delete_store/', DeleteStoreView.as_view()),
+    path('reviews/api/v1/get_reviews/', ReviewsShowView.as_view()),
+    path('reviews/api/v1/update_reviews/', ReviewsUpdateView.as_view()),
 
 ]

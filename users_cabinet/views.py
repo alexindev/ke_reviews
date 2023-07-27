@@ -9,9 +9,12 @@ from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
+from users_cabinet.serializers import ReviewSerializer
 
 from common.title import TitleMixin
 from users_cabinet.tasks import new_token, get_reviews
@@ -116,6 +119,23 @@ class GetTokenView(RedirectView):
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('start_page:main_page_url')
+
+
+class ReviewsShowView(ListAPIView):
+    """Вывывести все отзывы"""
+    serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        user = Users.objects.get(id=self.request.user.pk)
+        queryset = Reviews.objects.filter(user=user).order_by('-date_create')
+        return queryset
+
+
+class ReviewsUpdateView(APIView):
+    """Обновить отзывы"""
+    def get(self, request):
+        return Response({'message': 'update'})
 
 
 class DeleteStoreView(APIView):
