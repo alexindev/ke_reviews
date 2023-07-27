@@ -250,12 +250,37 @@ function renderReviewsTable(data) {
 }
 
 
+// Функция для создания кнопок пагинации с использованием стилей Bootstrap
+function createPaginationButtons(data) {
+    console.log(data);
+    const paginationUl = document.querySelector('.pagination');
+    paginationUl.innerHTML = ''; // Очищаем содержимое, если есть
+
+    // Кнопки для всех доступных страниц
+    for (let pageNumber = 1; pageNumber <= data.total_pages; pageNumber++) {
+        const pageButton = document.createElement('li');
+        pageButton.classList.add('page-item');
+        if (pageNumber === data.current_page) {
+            pageButton.classList.add('active');
+        }
+        pageButton.innerHTML = `
+            <a class="page-link" href="#">${pageNumber}</a>
+        `;
+        pageButton.addEventListener('click', function () {
+            loadPage(`api/v1/get_reviews/?page=${pageNumber}`);
+        });
+        paginationUl.appendChild(pageButton);
+    }
+}
+
+
 // Функция для загрузки данных и отображения таблицы и пагинации
 function loadPage(url) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
             renderReviewsTable(data);
+            createPaginationButtons(data);
         })
         .catch(error => {
             console.error('Ошибка при получении данных:', error);

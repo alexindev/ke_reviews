@@ -10,7 +10,6 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
-from rest_framework.pagination import PageNumberPagination
 
 from users.models import Users
 from users_cabinet.models import ProductData, Stores, Reviews
@@ -19,6 +18,7 @@ from users_cabinet.serializers import ReviewSerializer
 from common.title import TitleMixin
 from users_cabinet.tasks import new_token, get_reviews
 from users_cabinet.utils.stores import get_store
+from users_cabinet.utils.paginate import ReviewsPaginate
 
 
 class ProfileView(TitleMixin, ListView):
@@ -124,7 +124,7 @@ class UserLogoutView(LogoutView):
 class ReviewsShowView(ListAPIView):
     """Вывывести все отзывы"""
     serializer_class = ReviewSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = ReviewsPaginate
 
     def get_queryset(self):
         user = Users.objects.get(id=self.request.user.pk)
