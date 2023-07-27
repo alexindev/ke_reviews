@@ -252,7 +252,6 @@ function renderReviewsTable(data) {
 
 // Функция для создания кнопок пагинации с использованием стилей Bootstrap
 function createPaginationButtons(data) {
-    console.log(data);
     const paginationUl = document.querySelector('.pagination');
     paginationUl.innerHTML = ''; // Очищаем содержимое, если есть
 
@@ -264,7 +263,7 @@ function createPaginationButtons(data) {
             pageButton.classList.add('active');
         }
         pageButton.innerHTML = `
-            <a class="page-link" href="#">${pageNumber}</a>
+            <button class="page-link ml-1">${pageNumber}</button>
         `;
         pageButton.addEventListener('click', function () {
             loadPage(`api/v1/get_reviews/?page=${pageNumber}`);
