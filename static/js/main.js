@@ -172,6 +172,64 @@ if (window.location.pathname === '/profile/settings/') {
             })
     });
 
+    // Получить новый токен
+    const getTokenBtn = document.querySelector('#get-token')
+    getTokenBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        getTokenBtn.disabled = true;
+        const url = 'api/v1/get_token/';
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                messageAlert(data.message, data.status);
+                if (data.status) {
+                    setTimeout(() => getTaskStatus(data.task_id), 1000)
+                } else {
+                    getTokenBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    })
+
+    // Получить статус таска
+    function getTaskStatus(taskId) {
+        fetch(`api/v1/get_token_status/?task_id=${taskId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    if (data.token) {
+                        messageAlert(data.message, true)
+                        changeTokenMessage()
+                        getTokenBtn.disabled = false;
+                    } else {
+                        messageAlert(data.message, true)
+                        setTimeout(() => getTaskStatus(taskId), 1000)
+                    }
+                } else {
+                    console.log('epic fail')
+                    messageAlert(data.message, false)
+                    getTokenBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                getTokenBtn.disabled = false;
+            })
+    }
+
+    // Изменить сообщение в поле управления токеном
+    function changeTokenMessage() {
+        const tokenMessage = document.querySelector('.token-info')
+        getTokenBtn.textContent = 'Обновить токен'
+        if (tokenMessage) {
+            tokenMessage.textContent = 'Токен получен';
+            tokenMessage.classList.remove('text-gray');
+            tokenMessage.classList.add('text-success');
+        }
+    }
+
 
     // Добавить/изменить аватар пользователя
     const avatarForm = document.querySelector('#avatar-form');

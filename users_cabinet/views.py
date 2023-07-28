@@ -1,9 +1,8 @@
 from django.views.generic.list import ListView
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 from django.contrib.auth.views import LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import logout
-from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils import timezone
 
@@ -11,7 +10,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 
-from users.models import Users
+from celery.result import AsyncResult
+
+from users.models import User
 from users_cabinet.models import ProductData, Stores, Reviews
 from users_cabinet.serializers import ReviewSerializer
 
@@ -23,7 +24,7 @@ from users_cabinet.utils.paginate import ReviewsPaginate
 
 class ProfileView(TitleMixin, ListView):
     template_name = 'users_cabinet/profile.html'
-    model = Users
+    model = User
     title = 'Главное меню'
 
 
@@ -52,10 +53,10 @@ class ParserView(TitleMixin, ListView):
         select_period = int(self.request.GET.get('period-select', 1))
         time_delta = timezone.now() - timezone.timedelta(days=select_period)
         if not selected_store:  # Если не выбран магазин
-            queryset = queryset.filter(store__user__username=self.request.user, datetime__gte=time_delta)
+            queryset = queryset.filter(store__user__username=self.request.user, datetime__gte=time_delta).order_by('-datetime')
         elif selected_store:  # Если выбран магазин
             queryset = queryset.filter(store__store_name=selected_store, user__username=self.request.user,
-                                       datetime__gte=time_delta)
+                                       datetime__gte=time_delta).order_by('-datetime')
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -67,33 +68,18 @@ class ParserView(TitleMixin, ListView):
         return context
 
 
-class ReviewsView(TitleMixin, ListView):
+class ReviewsView(TitleMixin, TemplateView):
     template_name = 'users_cabinet/reviews.html'
     title = 'Отзывы'
     model = Reviews
-    ordering = '-date_create'
-    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = Users.objects.get(id=self.request.user.pk)
-
-        if not user.token:
+        if not self.request.user.token:
             context['token_message'] = 'Необходимо добавить данные для авторизации в настройках'
-        elif user.token_valid is False:
+        elif not self.request.user.token_valid:
             context['token_message'] = 'Необходимо заменить токен авторизации в настройках'
         return context
-
-    def get_queryset(self):
-        queryset = super().get_queryset().filter(user=self.request.user)
-        return queryset
-
-    def post(self, request, *args, **kwargs):
-        user = Users.objects.get(id=request.user.pk)
-        token = user.token
-        user_pk = user.pk
-        get_reviews.delay(token, user_pk)
-        return self.get(request, *args, **kwargs)
 
 
 class DeleteProfileView(RedirectView):
@@ -102,18 +88,6 @@ class DeleteProfileView(RedirectView):
     def post(self, request, *args, **kwargs):
         self.request.user.delete()
         logout(request)
-        return super().post(request, *args, **kwargs)
-
-
-class GetTokenView(RedirectView):
-    url = reverse_lazy('users_cabinet:profile_settings_url')
-
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        login = user.login_ke
-        password = user.pass_ke
-        new_token.delay(login, password)
-        messages.success(request, 'Получаем токен...')
         return super().post(request, *args, **kwargs)
 
 
@@ -127,7 +101,7 @@ class ReviewsShowView(ListAPIView):
     pagination_class = ReviewsPaginate
 
     def get_queryset(self):
-        user = Users.objects.get(id=self.request.user.pk)
+        user = User.objects.get(id=self.request.user.pk)
         queryset = Reviews.objects.filter(user=user).order_by('-date_create')
         return queryset
 
@@ -192,7 +166,7 @@ class ReviewDataView(APIView):
         login = request.data.get('login')
         password = request.data.get('password')
         if login and password:
-            user_data, created = Users.objects.update_or_create(
+            user_data, created = User.objects.update_or_create(
                 id=request.user.pk,
                 defaults={
                     'login_ke': login,
@@ -211,7 +185,7 @@ class UserPicView(APIView):
     def post(self, request):
         picture = request.data.get('picture')
         if picture:
-            user_data, created = Users.objects.update_or_create(
+            user_data, created = User.objects.update_or_create(
                 id=request.user.pk,
                 defaults={
                     'image': picture
@@ -224,3 +198,36 @@ class UserPicView(APIView):
         else:
             return Response({'message': 'Добавьте изображение', 'status': False})
 
+
+class GetNewTokenView(APIView):
+    """Получить новый токен для отзывов"""
+    def get(self, request):
+        user = User.objects.get(id=request.user.pk)
+        login_ke = user.login_ke
+        pass_ke = user.pass_ke
+
+        if not login_ke or not pass_ke:
+            return Response({'message': 'Логин и/или пароль не добавлены', 'status': False})
+
+        task = new_token.delay(login_ke, pass_ke)
+        return Response({'message': 'Получаем токен...', 'task_id': task.id, 'status': True})
+
+
+class GetTokenStatusView(APIView):
+    """Проверка статуса таска"""
+    def get(self, request):
+        task_id = request.GET.get('task_id')
+        if not task_id:
+            return Response({'message': 'Task ID не задан', 'status': False})
+
+        task = AsyncResult(task_id)
+        if task.state == 'SUCCESS':
+            result = task.result
+            if result:
+                return Response({'message': 'Токен успешно получен', 'token': result, 'status': True})
+            else:
+                return Response({'message': 'Задача завершилась неудачно', 'status': False})
+        elif task.state == 'PENDING' or task.state == 'STARTED':
+            return Response({'message': 'Идет процесс получения токена...', 'status': True})
+        else:
+            return Response({'message': 'Ошибка при выполнении задачи', 'status': False})
