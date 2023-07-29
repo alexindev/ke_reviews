@@ -59,13 +59,13 @@ function handleStoreItemClick(event) {
     if (!storeItem) return;
 
     const storeId = storeItem.dataset.storeId;
-    const storeStatus = storeItem.querySelector('.store-status');
     const storeDelete = storeItem.querySelector('.store-delete');
+    const storeStatus = storeItem.querySelector('.store-status');
 
     // Изменить статус магазина
     if (storeStatus.contains(targetElement)) {
         const storeStatusValue = storeStatus.dataset.storeStatus;
-        const url = `api/v1/store_status/`;
+        const url = `${window.location.origin}/api/v1/store_status/`;
         const bodyData = JSON.stringify({
             store_id: storeId,
             store_status: storeStatusValue,
@@ -86,7 +86,7 @@ function handleStoreItemClick(event) {
 
     // Удалить магазин
     if (storeDelete.contains(targetElement)) {
-        const url = `api/v1/delete_store/`;
+        const url = `${window.location.origin}/api/v1/delete_store/`;
         const bodyData = JSON.stringify({
             store_id: storeId,
         });
@@ -103,19 +103,19 @@ function handleStoreItemClick(event) {
 }
 
 
+// Страница настроек
 if (window.location.pathname === '/profile/settings/') {
 
     // Блок со всеми магазинами в настройках
     document.querySelector('.stores-container').addEventListener('click', handleStoreItemClick);
-
 
     // Добавить новый магазин
     const newStoreForm = document.querySelector('#new-store');
     newStoreForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const newStoreInput = document.querySelector('#store-url')
-        const newStoreValue = newStoreInput.value
-        const url = 'api/v1/new_store/'
+        const newStoreValue = newStoreInput.value;
+        const url = `${window.location.origin}/api/v1/new_store/`;
         const bodyData = JSON.stringify(
             {
                 new_store: newStoreValue
@@ -139,8 +139,6 @@ if (window.location.pathname === '/profile/settings/') {
 
                     const storesContainer = document.querySelector('.stores-container');
                     storesContainer.appendChild(newStoreItem);
-                    // storeItems = document.querySelectorAll('.store-items');
-                    // console.log(storeItems)
                 }
                 messageAlert(data.message, data.status)
             })
@@ -156,7 +154,7 @@ if (window.location.pathname === '/profile/settings/') {
         e.preventDefault();
         const reviewLogin = document.querySelector('#review-login').value
         const reviewPassword = document.querySelector('#review-password').value
-        const url = 'api/v1/review/'
+        const url = `${window.location.origin}/api/v1/review/`;
         const bodyData = JSON.stringify(
             {
                 login: reviewLogin,
@@ -177,13 +175,13 @@ if (window.location.pathname === '/profile/settings/') {
     getTokenBtn.addEventListener('click', function (e) {
         e.preventDefault();
         getTokenBtn.disabled = true;
-        const url = 'api/v1/get_token/';
+        const url = `${window.location.origin}/api/v1/get_token/`;
         fetch(url)
             .then(response => response.json())
             .then(data => {
                 messageAlert(data.message, data.status);
                 if (data.status) {
-                    setTimeout(() => getTaskStatus(data.task_id), 1000)
+                    setTimeout(() => getTokenTaskStatus(data.task_id), 1000)
                 } else {
                     getTokenBtn.disabled = false;
                 }
@@ -193,9 +191,9 @@ if (window.location.pathname === '/profile/settings/') {
             })
     })
 
-    // Получить статус таска
-    function getTaskStatus(taskId) {
-        fetch(`api/v1/get_token_status/?task_id=${taskId}`)
+    // Получить статус таска при получении токена
+    function getTokenTaskStatus(taskId) {
+        fetch(`${window.location.origin}/api/v1/get_task_status/?task_id=${taskId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status) {
@@ -205,7 +203,7 @@ if (window.location.pathname === '/profile/settings/') {
                         getTokenBtn.disabled = false;
                     } else {
                         messageAlert(data.message, true)
-                        setTimeout(() => getTaskStatus(taskId), 1000)
+                        setTimeout(() => getTokenTaskStatus(taskId), 1000)
                     }
                 } else {
                     console.log('epic fail')
@@ -235,7 +233,7 @@ if (window.location.pathname === '/profile/settings/') {
     const avatarForm = document.querySelector('#avatar-form');
     avatarForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        const url = 'api/v1/avatar/'
+        const url = `${window.location.origin}/api/v1/avatar/`
         const userPicture = document.querySelector('#avatar-input')
         const formData = new FormData();
         formData.append('picture', userPicture.files[0]);
@@ -263,22 +261,27 @@ if (window.location.pathname === '/profile/settings/') {
 }
 
 
+// Страница с отзывами
 if (window.location.pathname === '/profile/reviews/') {
-    // При загрузке страницы сразу загружаем первую страницу отзывов
-    loadPage('api/v1/get_reviews/');
 
     // Кнопка обновить отзывы
     const updateReviewsBtn = document.querySelector('#update-reviews')
 
-    updateReviewsBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        fetch('api/v1/update_reviews/')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-            })
+    if (updateReviewsBtn) {
 
-    })
+        // При загрузке страницы сразу загружаем первую страницу отзывов
+        loadPage(`${window.location.origin}/api/v1/get_reviews/`);
+
+        updateReviewsBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetch(`${window.location.origin}/api/v1/update_reviews/`)
+                .then(response => response.json())
+                .then(data => {
+                    messageAlert(data.message, data.status)
+                    setTimeout(()=> loadPage(`${window.location.origin}/api/v1/get_reviews/`), 3000);
+                })
+        })
+    }
 }
 
 function renderReviewsTable(data) {
@@ -313,20 +316,22 @@ function createPaginationButtons(data) {
     const paginationUl = document.querySelector('.pagination');
     paginationUl.innerHTML = ''; // Очищаем содержимое, если есть
 
-    // Кнопки для всех доступных страниц
-    for (let pageNumber = 1; pageNumber <= data.total_pages; pageNumber++) {
-        const pageButton = document.createElement('li');
-        pageButton.classList.add('page-item');
-        if (pageNumber === data.current_page) {
-            pageButton.classList.add('active');
+    if (data.items !== 0) {
+        // Кнопки для всех доступных страниц
+        for (let pageNumber = 1; pageNumber <= data.total_pages; pageNumber++) {
+            const pageButton = document.createElement('li');
+            pageButton.classList.add('page-item');
+            if (pageNumber === data.current_page) {
+                pageButton.classList.add('active');
+            }
+            pageButton.innerHTML = `
+                <button class="page-link ml-1">${pageNumber}</button>
+            `;
+            pageButton.addEventListener('click', function () {
+                loadPage(`${window.location.origin}/api/v1/get_reviews/?page=${pageNumber}`);
+            });
+            paginationUl.appendChild(pageButton);
         }
-        pageButton.innerHTML = `
-            <button class="page-link ml-1">${pageNumber}</button>
-        `;
-        pageButton.addEventListener('click', function () {
-            loadPage(`api/v1/get_reviews/?page=${pageNumber}`);
-        });
-        paginationUl.appendChild(pageButton);
     }
 }
 
