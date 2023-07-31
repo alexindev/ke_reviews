@@ -17,10 +17,10 @@ class UserRegustrationView(TitleMixin, SuccessMessageMixin, CreateView):
     title = 'Регистрация пользователей'
 
 
-class UserAuthView(LoginView):
+class UserAuthView(TitleMixin, LoginView):
     template_name = 'users/auth.html'
     success_url = reverse_lazy('users_cabinet:users_profile_url')
     form_class = LoginForm
     redirect_authenticated_user = True
-
+    title = 'Авторизация пользователей'
 

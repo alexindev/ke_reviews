@@ -1,6 +1,5 @@
 from django.views.generic.list import ListView
 from django.views.generic.base import RedirectView
-from django.contrib.auth.views import LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import logout
 from django.urls import reverse_lazy
@@ -85,8 +84,4 @@ class DeleteProfileView(RedirectView):
         logout(request)
         return super().post(request, *args, **kwargs)
 
-
-class UserLogoutView(LogoutView):
-    """Разлогиниться"""
-    next_page = reverse_lazy('start_page:main_page_url')
 

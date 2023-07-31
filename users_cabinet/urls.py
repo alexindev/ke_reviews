@@ -10,6 +10,5 @@ urlpatterns = [
     path('settings/', login_required(SettingsView.as_view()), name='profile_settings_url'),
     path('parser/', login_required(ParserView.as_view()), name='parser_url'),
     path('reviews/', login_required(ReviewsView.as_view()), name='reviews_url'),
-    path('logout/', login_required(UserLogoutView.as_view()), name='logout_url'),
     path('delete_profile/', login_required(DeleteProfileView.as_view()), name='delete_profile_url'),
 ]

@@ -12,7 +12,7 @@
         <li><a href="{% url 'start_page:start_page_url' %}#reviews" class="no-project">Генератор отзывов</a></li>
         <li><a href="https://github.com/alexindev/ke_services" class="no-project">Код проекта</a></li>
         {% if user.is_authenticated %}
-            <li><a href="{% url 'users_cabinet:logout_url' %}" class="no-project">Выйти</a></li>
+            <li><a href="{% url 'start_page:logout_url' %}" class="no-project">Выйти</a></li>
         {% endif %}
     </ul>
     <ul class="social-icons">
