@@ -2,19 +2,19 @@ from datetime import timedelta
 from celery import shared_task
 from django.utils import timezone
 
-from users.models import Users
+from users.models import User
 from users_cabinet.models import ProductData, Stores, Reviews, SalesData
 
-from users_cabinet.utils.token import get_token
-from users_cabinet.utils.reviews import get_review
-from users_cabinet.utils.parser import ProductId, ProductSKU
+from rest.utils.token import get_token
+from rest.utils.reviews import get_review
+from rest.utils.parser import ProductId, ProductSKU
 
 
 @shared_task
 def new_token(login: str, password: str) -> str | None:
     """Новый токен для отзывов"""
     token = get_token(login, password)
-    user = Users.objects.get(login_ke=login)
+    user = User.objects.get(login_ke=login)
     if token:
         user.login_valid = True
         user.token_valid = True
@@ -29,7 +29,7 @@ def new_token(login: str, password: str) -> str | None:
 def get_reviews(token: str, user_pk: int) -> bool:
     """Получить отзывы"""
     reviews = get_review(token)
-    user = Users.objects.get(pk=user_pk)
+    user = User.objects.get(pk=user_pk)
     if reviews:
         for review in reviews:
             Reviews.objects.update_or_create(

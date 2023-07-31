@@ -6,9 +6,9 @@ from users.models import User
 from users_cabinet.models import Stores, Reviews
 
 from rest.serializers import ReviewSerializer
-from users_cabinet.tasks import new_token, get_reviews
-from users_cabinet.utils.stores import get_store
-from users_cabinet.utils.paginate import ReviewsPaginate
+from rest.tasks import new_token, get_reviews
+from rest.utils.stores import get_store
+from rest.utils.paginate import ReviewsPaginate
 
 from celery.result import AsyncResult
 
