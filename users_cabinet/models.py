@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import Users
+from users.models import User
 
 
 class ProductData(models.Model):
@@ -13,7 +13,7 @@ class ProductData(models.Model):
     param1 = models.CharField(max_length=50, null=True, blank=True)
     param2 = models.CharField(max_length=50, null=True, blank=True)
     datetime = models.DateField(auto_now_add=True)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     store = models.ForeignKey('Stores', on_delete=models.CASCADE)
 
     class Meta:
@@ -45,7 +45,7 @@ class Stores(models.Model):
     store_name = models.CharField(max_length=50)
     store_url = models.CharField(max_length=100)
     status = models.BooleanField(default=False)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'магазин'
@@ -62,7 +62,7 @@ class Reviews(models.Model):
     rating = models.PositiveSmallIntegerField(null=True)
     review_id = models.PositiveIntegerField()
     date_create = models.DateField()
-    user = models.ForeignKey(to=Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'отзыв'

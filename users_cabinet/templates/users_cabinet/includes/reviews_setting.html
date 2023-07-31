@@ -42,23 +42,17 @@
                         <p class="text-danger">Проверьте корректность логина и/или пароля</p>
                     {% endif %}
                 {% else %}
-                    <p class="text-gray">Для работы сервиса отзывов необходимо получить токен</p>
+                    <p class="text-gray token-info">Для работы сервиса отзывов необходимо получить токен</p>
                 {% endif %}
-
-                <form method="post" action="{% url 'users_cabinet:get_token_url' %}">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-12">
-                            <button class="btn btn-outline-primary mt-2" type="submit">
-                                {% if user.token %}
-                                    Обновить токен
-                                {% else %}
-                                    Получить токен
-                                {% endif %}
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                <div class="row col-12">
+                    <button class="btn btn-outline-primary mt-2" id="get-token">
+                        {% if user.token %}
+                            Обновить токен
+                        {% else %}
+                            Получить токен
+                        {% endif %}
+                    </button>
+                </div>
             </div>
         </div>
     </div>

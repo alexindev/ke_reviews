@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'start_page',
     'users',
     'users_cabinet',
+    'rest'
 ]
 
 MIDDLEWARE = [
@@ -146,7 +147,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.Users'
+AUTH_USER_MODEL = 'users.User'
 
 LOGIN_URL = reverse_lazy('users:auth_page_url')
 LOGIN_REDIRECT_URL = reverse_lazy('users_cabinet:users_profile_url')
@@ -163,5 +164,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20
 
 }

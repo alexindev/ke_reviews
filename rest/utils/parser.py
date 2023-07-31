@@ -2,7 +2,7 @@ import requests
 from loguru import logger
 from typing import Generator, Set, Tuple
 
-from users_cabinet.utils.config import headers, query
+from rest.utils.config import headers, query
 
 class ProductId:
     def __init__(self, url: str):
