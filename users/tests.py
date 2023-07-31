@@ -39,7 +39,8 @@ class UserAuthRegisterTestCace(TestCase):
             'password': password
         })
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/profile/dashboard/')
+        self.assertTrue(user.is_authenticated)
+        self.assertEqual(response.url, reverse('users_cabinet:users_profile_url'))
 
     def test_reg_page(self):
         """Страница регистрации"""
@@ -72,6 +73,6 @@ class UserAuthRegisterTestCace(TestCase):
 
         new_user = User.objects.get(username=username)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/users/auth/')
+        self.assertEqual(response.url, reverse('users:auth_page_url'))
         self.assertEqual(new_user.username, username)
         self.assertTrue(new_user.is_authenticated)
