@@ -11,10 +11,10 @@ from rest.utils.parser import ProductId, ProductSKU
 
 
 @shared_task
-def new_token(login: str, password: str) -> str | None:
+def new_token(user_id: int, login: str, password: str) -> str | None:
     """Новый токен для отзывов"""
     token = get_token(login, password)
-    user = User.objects.get(login_ke=login)
+    user = User.objects.get(id=user_id)
     if token:
         user.login_valid = True
         user.token_valid = True

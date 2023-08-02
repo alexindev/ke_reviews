@@ -131,7 +131,7 @@ class GetNewTokenView(APIView):
         if not login_ke or not pass_ke:
             return Response({'message': 'Логин и/или пароль не добавлены', 'status': False})
 
-        task = new_token.delay(login_ke, pass_ke)
+        task = new_token.delay(request.user.pk, login_ke, pass_ke)
         return Response({'message': 'Получаем токен...', 'task_id': task.id, 'status': True})
 
 

@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  database:
+    image: postgres:15.0-alpine
+    container_name: postgres
+    restart: always
+    env_file: .env
+    volumes:
+      - .postgres_data:/var/lib/postgresql/data
+
+  broker:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+
+  celery:
+    build:
+      dockerfile: Dockerfile
+    container_name: celery
+    restart: always
+    env_file:
+      - .env
+    command: bash -c "playwright install --with-deps chromium && celery -A ke_service worker --beat --scheduler django --loglevel=info"
+    depends_on:
+      - myapp
+
+  celery_flower:
+    image: mher/flower
+    container_name: celery_flower
+    restart: always
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    depends_on:
+      - celery
+
+  myapp:
+    build:
+      dockerfile: Dockerfile
+    container_name: myapp
+    restart: always
+    env_file: .env
+    ports:
+      - "8000:8000"
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - database
+      - broker

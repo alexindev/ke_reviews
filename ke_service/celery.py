@@ -5,7 +5,7 @@ from celery import Celery
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ke_service.settings')
 
-app = Celery('ke_service')
+app = Celery('ke_service', broker_connection_retry_on_startup=True)
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
