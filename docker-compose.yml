@@ -21,7 +21,7 @@ services:
     restart: always
     env_file:
       - .env
-    command: bash -c "playwright install --with-deps chromium && celery -A ke_service worker --beat --scheduler django --loglevel=info"
+    command: bash -c "celery -A ke_service worker --beat --scheduler django --loglevel=info" #playwright install --with-deps chromium &&
     depends_on:
       - myapp
 
@@ -36,15 +36,29 @@ services:
     depends_on:
       - celery
 
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./static:/static
+      - ./media:/media
+    depends_on:
+      - myapp
+
   myapp:
-    build:
-      dockerfile: Dockerfile
+    build: .
     container_name: myapp
     restart: always
     env_file: .env
     ports:
       - "8000:8000"
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: /app/entrypoint.sh
     depends_on:
       - database
       - broker
+
+volumes:
+  postgres_data:

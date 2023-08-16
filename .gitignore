@@ -4,6 +4,8 @@
 *.env
 *.gitignore
 *__pycache__
-/media
-*.jpg
+/media/user_pic/*
 **/migrations/
+/.postgres_data
+/static/admin/*
+/static/rest_framework/*
