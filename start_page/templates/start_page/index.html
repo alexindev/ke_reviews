@@ -1,59 +1,56 @@
 {% extends 'base.html' %}
 
-{{ title }}
-
 {% block header %}
-    <div class="container">
-        <div class="header-info">
-            <h1>KE Services</h1>
-            <p>Сервисы для работы с маркетплейсом KazanExpress
-            </p>
-            <a href="{% if user.is_authenticated %}
-                        {% url 'users_cabinet:users_profile_url' %}
-                    {% else %}
-                        {% url 'users:auth_page_url' %}
-                    {% endif %}" class="btn btn-primary">Попробовать</a>
-        </div>
+    <div class="header-info">
+        <h1>KE Services</h1>
+        <p>Сервисы для работы с маркетплейсом KazanExpress</p>
+        <a href="{% if user.is_authenticated %}
+                    {% url 'users_cabinet:users_profile_url' %}
+                {% else %}
+                    {% url 'users:auth_page_url' %}
+                {% endif %}" class="btn btn-primary">Попробовать</a>
     </div>
 {% endblock %}
 
 {% block content %}
-	<section id="parser">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-4">
-                    <h2> Секция парсер</h2>
-				</div>
-			</div>
-		</div>
-	</section>
-	<section id="reviews" class="darker">
+    <!-- Секция "Парсер" -->
+    <section id="parser">
         <div class="container">
-			<div class="row">
-				<div class="col-md-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <h2> Секция парсер</h2>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция "Автоответчик отзывов" -->
+    <section id="reviews" class="darker">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
                     <h2> Секция автоответчик отзывов</h2>
                 </div>
             </div>
         </div>
-	</section>
-	<!-- Footer start -->
-	<footer>
-		<div class="container">
-			<div class="row">
-				<div class="col-md-8">
-					<p>&copy; 2023 by <a href="https://github.com/alexindev/ke_services" target="_blank">GitHub</a></p>
-				</div>
-				<div class="col-md-4">
-					<ul class="social-icons">
-						<li><a href="https://github.com/alexindev/ke_services"><i class="fa fa-github"></i></a></li>
-						<li><a href=""><i class="fa fa-facebook"></i></a></li>
-						<li><a href=""><i class="fa fa-twitter"></i></a></li>
-						<li><a href=""><i class="fa fa-vk"></i></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</footer>
-	<!-- Footer end  -->
+    </section>
 
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <p>&copy; 2023 by <a href="https://github.com/alexindev/ke_services" target="_blank">GitHub</a></p>
+                </div>
+                <div class="col-md-4">
+                    <ul class="social-icons">
+                        <li><a href="https://github.com/alexindev/ke_services"><i class="fa fa-github"></i></a></li>
+                        <li><a href=""><i class="fa fa-facebook"></i></a></li>
+                        <li><a href=""><i class="fa fa-twitter"></i></a></li>
+                        <li><a href=""><i class="fa fa-vk"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
 {% endblock %}

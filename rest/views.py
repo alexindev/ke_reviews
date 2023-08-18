@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
+from rest_framework import status
 
-from users.models import User
-from users_cabinet.models import Stores, Reviews
+from django.contrib.auth import authenticate, login
+from django.db import IntegrityError
 
 from rest.serializers import ReviewSerializer
 from rest.tasks import new_token, get_reviews
@@ -11,6 +12,36 @@ from rest.utils.stores import get_store
 from rest.utils.paginate import ReviewsPaginate
 
 from celery.result import AsyncResult
+from users.models import User
+from users_cabinet.models import Stores, Reviews
+
+
+class UserAuthView(APIView):
+    """Авторизация пользователей"""
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Проверьте корректность логина и пароля'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class UserRegisterView(APIView):
+    """Регистрация поьзователей"""
+    def post(self, request):
+        try:
+            username = request.data.get('username')
+            password = request.data.get('password')
+            User.objects.create_user(username=username, password=password)
+            return Response(status=status.HTTP_201_CREATED)
+        except IntegrityError:
+            return Response({'message': 'Пользователь с таким именем уже зарегистрирован'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewsShowView(ListAPIView):

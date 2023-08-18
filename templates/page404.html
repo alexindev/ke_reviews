@@ -1,7 +1,25 @@
-{% block title%}
-Запрашиваемая страница не найдена
-{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Not Found</title>
+    <link rel="stylesheet" href="{% static 'css/404.css' %}">
+</head>
+<body>
 
-{% block content %}
-<h1>Страница не найдена</h1>
-{% endblock %}
+<h1>404</h1>
+
+<div class="frame">
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+<div class="caps"><img src="http://ademilter.com/caps.png" alt=""></div>
+<canvas id="canvas"></canvas>
+
+
+<script type="text/javascript" src="{% static 'js/404.js' %}"></script>
+</body>
+</html>

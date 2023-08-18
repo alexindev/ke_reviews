@@ -16,24 +16,24 @@
 	<link href='https://fonts.googleapis.com/css?family=Lora' rel='stylesheet' type='text/css'>
 
 	<!-- Load CSS styles -->
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
-          integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
           crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
     <link rel="icon" href="{% static 'img/icon.ico' %}" type="images/x-icon"/>
 
 </head>
 <body>
-	<div class="jumbotron home home-fullscreen" id="home">
+    {% csrf_token %}
+	<div class="jumbotron home home-fullscreen d-flex justify-content-center align-items-center" id="home">
 		<div class="mask"></div>
 		<a href="{% url 'start_page:start_page_url' %}" class="logo">
 			<img src="{% static 'img/logo.png' %}" alt="KE Services">
 		</a>
         <a href="" class="menu-toggle" id="nav-expander"><i class="fa fa-bars"></i></a>
 
-        {% include 'menu.html' %}
         {% block header %} {% endblock %}
+        {% include 'menu.html' %}
 
 	</div>
     {% block content %} {% endblock %}
@@ -41,11 +41,9 @@
 	<!-- Load jQuery -->
 	<script type="text/javascript" src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
 
-	<!-- Load Booststrap -->
-	<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
-
 	<!-- Load custom js for theme -->
 	<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/custom.js' %}"></script>
     <script src="https://use.fontawesome.com/4c12b49614.js"></script>
 
 </body>
