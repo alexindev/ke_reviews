@@ -13,4 +13,6 @@ urlpatterns = [
     path('get_task_status/', GetTaskStatusView.as_view()),
     path('get_reviews/', ReviewsShowView.as_view()),
     path('update_reviews/', ReviewsUpdateView.as_view()),
+    path('auth/', UserAuthView.as_view(), name='auth'),
+    path('register/', UserRegisterView.as_view(), name='register'),
 ]
