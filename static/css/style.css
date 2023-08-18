@@ -34,9 +34,6 @@ h2.title {
 	font-size: 40px;
 }
 
-p{
-	color: #808080;
-}
 
 p.form{
 	font-size: 16px;
@@ -79,14 +76,49 @@ a:focus{
 	transition: right 0.4s;
 }
 
+.menu-content {
+    text-align: center;
+}
+.menu-content h3 {
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+.menu-content .nav > li > a {
+    display: block;
+    padding: 7px;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.menu-content .nav > li > a:hover,
+.menu-content .nav > li > a:focus {
+    color: #fa694e;
+}
+
+.menu-content .nav > li {
+    display: block;
+}
+.menu .nav {
+    display: block;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
 .menu.nav-expanded{
 	right: 0;
 }
 
-.menu .close{
-	color: #fff;
-	margin-right: 10px;
-	margin-top:10px;
+.menu .close {
+    color: #777; /* Оттенок серого */
+    margin-right: 10px;
+    margin-top: 10px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px; /* Увеличенный размер */
 }
 
 .menu h3{
@@ -94,19 +126,6 @@ a:focus{
 	text-transform: uppercase;
 }
 
-.menu .nav{
-	padding: 0;
-}
-
-.menu .nav > li > a{
-	color: #fff;
-}
-
-.menu .nav > li > a:hover,
-.menu .nav > li > a:focus{
-	background: transparent;
-	color: #fa694e;
-}
 
 .menu .social-icons{
 	margin-top: 50px;
@@ -140,36 +159,12 @@ a:focus{
 	color: #fff;
 }
 
-.jumbotron .mask{
-	position: absolute;
-	display: block;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: #333;
-	opacity: 0.5;
-}
-
-.jumbotron p{
-	color: #efefef;
-}
-
-.jumbotron .container{
-	margin-top: 20%;
-}
 
 .jumbotron h1{
 	text-transform: uppercase;
 	margin-bottom: 30px;
 }
 
-.header-info{
-	position: relative;
-	top: 50%;
-	-webkit-transform: translateY(-50%);
-	transform: translateY(-50%);
-}
 
 .btn{
 	margin-top: 20px;
@@ -235,6 +230,7 @@ form{
 .form-control{
 	padding: 17px 25px;
 	font-size: 16px;
+	width: 100%;
 	height: auto;
 	border-radius: 0;
 	background: #f1f4f7;
@@ -290,4 +286,55 @@ ul.social-icons > li > a{
 	.jumbotron .h1 {
 		font-size: 75px;
 	}
+}
+
+
+*:focus {
+  outline: none;
+}
+
+
+.app-title {
+text-align: center;
+}
+
+.login-form {
+text-align: center;
+}
+.control-group {
+margin-bottom: 10px;
+}
+
+input {
+text-align: center;
+background-color: #ECF0F1;
+border: 2px solid transparent;
+border-radius: 3px;
+font-size: 16px;
+font-weight: 200;
+padding: 10px 0;
+width: 300px;
+transition: border .5s;
+}
+
+input:focus {
+border: 2px solid #fa5c58;;
+box-shadow: none;
+}
+
+
+.custom-alert .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+    background-color: transparent;
+    border: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.custom-alert.show {
+    display: block;
 }
