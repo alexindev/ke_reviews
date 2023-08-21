@@ -58,10 +58,11 @@ class NewStoreTestCase(TestCase):
         Магазин уже добавлен
         Статус код 400
         """
+        self.url = reverse('rest:store_status')
         store_name = 'kazanexpress'
         store_url = f'https://kazanexpress.ru/{store_name}'
-        Stores.objects.create(store_url=store_url, store_name=store_name, user=self.user)
         data = {'new_store': store_url}
+        Stores.objects.create(store_url=store_url, store_name=store_name, user=self.user)
 
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -77,10 +78,11 @@ class ManageStoreTestCase(TestCase):
         """
         username = 'testuser'
         password = 'testpassword'
-        store_url = 'https://kazanexpress.ru/kazanexpress'
+        self.store_name = 'kazanexpress'
+        store_url = f'https://kazanexpress.ru/{self.store_name}'
         self.user = User.objects.create_user(username=username, password=password)
         self.client.login(username=username, password=password)
-        Stores.objects.create(user=self.user, store_url=store_url)
+        self.store = Stores.objects.create(user=self.user, store_url=store_url, store_name=self.store_name)
 
     def test_update_store_status_success(self):
         """
@@ -90,7 +92,7 @@ class ManageStoreTestCase(TestCase):
         url = reverse('rest:store_status')
         data = {'store_id': self.user.pk, 'store_status': 'False'}
         response = self.client.put(path=url, data=data, content_type='application/json')
-        self.assertEqual(response.data.get('message'), True)
+        self.assertEqual(response.data.get('message'), 'True')
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
 
     def test_update_store_status_fail(self):
@@ -105,7 +107,7 @@ class ManageStoreTestCase(TestCase):
         self.assertEqual(response.data.get('message'), 'Магазин не найден')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_update_store_status_nok(self):
+    def test_update_store_status_bad(self):
         """
         Ошибка при смене статуса.
         Не передан ID магазина
@@ -115,5 +117,40 @@ class ManageStoreTestCase(TestCase):
         data = {'store_id': '', 'store_status': 'False'}
         response = self.client.put(path=url, data=data, content_type='application/json')
         self.assertEqual(response.data.get('message'), 'Не корректное переключение статуса')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_store_success(self):
+        """
+        Успешное удаление магазина
+        Статус код 202
+        """
+        url = reverse('rest:delete_store')
+        data = {'store_id': self.store.pk}
+        response = self.client.delete(path=url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'),  f'Магазин {self.store_name} удален')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+    def test_delete_store_fail(self):
+        """
+        Ошибка удаления магазина
+        Магазин не найден в БД
+        Статус код 404
+        """
+        url = reverse('rest:delete_store')
+        data = {'store_id': 999}
+        response = self.client.delete(path=url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Магазин не найден')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_store_bad(self):
+        """
+        Ошибка удаления магазина
+        Не передан store_id
+        Статус код 400
+        """
+        url = reverse('rest:delete_store')
+        data = {'store_id': ''}
+        response = self.client.delete(path=url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Ошибка удаления магазина')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

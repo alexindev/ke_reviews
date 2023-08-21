@@ -19,15 +19,6 @@ function messageAlert(message, status) {
 }
 
 
-// Изменить иконку статуса магазинов
-// function updateStoreStatus(storeElement, storeId, newStatus) {
-//     storeElement.innerHTML = newStatus === 'True'
-//         ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
-//         : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>'
-//     storeElement.dataset.storeStatus = newStatus === 'True' ? 'True' : 'False'
-// }
-
-
 // Отправка и получение запроса
 function fetchData(url, method, contentType, bodyData) {
     const headers = {
@@ -54,42 +45,72 @@ function fetchData(url, method, contentType, bodyData) {
 function handleStoreItemClick(event) {
     event.preventDefault();
     const targetElement = event.target;
-    const storeStatus = targetElement.closest('.store-status');
+    const storeItem = targetElement.closest('.store-items');
 
-    if (!storeStatus) return;
+    if (!storeItem) return;
 
-    const storeId = storeStatus.closest('.store-items').dataset.storeId;
-    const storeStatusValue = storeStatus.dataset.storeStatus;
-    const url = `${window.location.origin}/api/v1/store_status/`;
+    const storeId = storeItem.dataset.storeId;
+    const storeDelete = storeItem.querySelector('.store-delete');
+    const storeStatus = storeItem.querySelector('.store-status');
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+    }
 
-    fetch(url, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({
-            store_id: storeId,
-            store_status: storeStatusValue
+    // изменить статус магазина
+    if (storeStatus.contains(targetElement)) {
+        const storeStatusValue = storeStatus.dataset.storeStatus;
+        let status = null;
+        fetch(`${window.location.origin}/api/v1/store_status/`, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify({
+                store_id: storeId,
+                store_status: storeStatusValue
+            })
         })
-    })
-    .then(response => {
-        if (response.status === 202) {
-            return response.json();
-        } else {
-            throw new Error('Something went wrong');
-        }
-    })
-    .then(data => {
-        const newStatus = data.message;
-        storeStatus.innerHTML = newStatus === 'True'
-            ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
-            : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>';
-        storeStatus.dataset.storeStatus = newStatus;
-    })
-    .catch(error => {
-        console.log(error);
-    });
+            .then(response => {
+                status = response.status === 202
+                return response.json();
+            })
+            .then(data => {
+                if (status){
+                    const newStatus = data.message;
+                    storeStatus.innerHTML = newStatus === 'True'
+                        ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
+                        : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>';
+                    storeStatus.dataset.storeStatus = newStatus;
+                } else {
+                    messageAlert(data.message, false)
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    // удалить магазин
+    if (storeDelete.contains(targetElement)) {
+        let status = null;
+        fetch(`${window.location.origin}/api/v1/delete_store/`, {
+            method: 'DELETE',
+            headers: headers,
+            body: JSON.stringify({
+                store_id: storeId
+            })
+        })
+            .then(response => {
+                status = response.status === 201
+                return response.json();
+            })
+            .then(data => {
+                storeItem.remove();
+                messageAlert(data.message, false);
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
 }
 
 
