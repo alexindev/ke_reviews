@@ -20,12 +20,12 @@ function messageAlert(message, status) {
 
 
 // Изменить иконку статуса магазинов
-function updateStoreStatus(storeElement, storeId, newStatus) {
-    storeElement.innerHTML = newStatus === 'True'
-        ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
-        : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>'
-    storeElement.dataset.storeStatus = newStatus === 'True' ? 'True' : 'False'
-}
+// function updateStoreStatus(storeElement, storeId, newStatus) {
+//     storeElement.innerHTML = newStatus === 'True'
+//         ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
+//         : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>'
+//     storeElement.dataset.storeStatus = newStatus === 'True' ? 'True' : 'False'
+// }
 
 
 // Отправка и получение запроса
@@ -54,80 +54,77 @@ function fetchData(url, method, contentType, bodyData) {
 function handleStoreItemClick(event) {
     event.preventDefault();
     const targetElement = event.target;
-    const storeItem = targetElement.closest('.store-items');
+    const storeStatus = targetElement.closest('.store-status');
 
-    if (!storeItem) return;
+    if (!storeStatus) return;
 
-    const storeId = storeItem.dataset.storeId;
-    const storeDelete = storeItem.querySelector('.store-delete');
-    const storeStatus = storeItem.querySelector('.store-status');
+    const storeId = storeStatus.closest('.store-items').dataset.storeId;
+    const storeStatusValue = storeStatus.dataset.storeStatus;
+    const url = `${window.location.origin}/api/v1/store_status/`;
 
-    // Изменить статус магазина
-    if (storeStatus.contains(targetElement)) {
-        const storeStatusValue = storeStatus.dataset.storeStatus;
-        const url = `${window.location.origin}/api/v1/store_status/`;
-        const bodyData = JSON.stringify({
+    fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
             store_id: storeId,
-            store_status: storeStatusValue,
-        });
-
-        fetchData(url, 'PUT', 'application/json', bodyData)
-            .then(data => {
-                if (data.status) {
-                    updateStoreStatus(storeStatus, storeId, data.message);
-                } else {
-                    messageAlert(data.message, data.status);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    // Удалить магазин
-    if (storeDelete.contains(targetElement)) {
-        const url = `${window.location.origin}/api/v1/delete_store/`;
-        const bodyData = JSON.stringify({
-            store_id: storeId,
-        });
-
-        fetchData(url, 'DELETE', 'application/json', bodyData)
-            .then(data => {
-                storeItem.remove();
-                messageAlert(data.message, data.status);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
+            store_status: storeStatusValue
+        })
+    })
+    .then(response => {
+        if (response.status === 202) {
+            return response.json();
+        } else {
+            throw new Error('Something went wrong');
+        }
+    })
+    .then(data => {
+        const newStatus = data.message;
+        storeStatus.innerHTML = newStatus === 'True'
+            ? '<i class="fa fa-pause fa-lg text-warning mr-2" aria-hidden="true"></i>'
+            : '<i class="fa fa-play fa-lg text-success mr-2" aria-hidden="true"></i>';
+        storeStatus.dataset.storeStatus = newStatus;
+    })
+    .catch(error => {
+        console.log(error);
+    });
 }
 
 
 // Страница настроек
 if (window.location.pathname === '/profile/settings/') {
 
-    // Блок со всеми магазинами в настройках
-    document.querySelector('.stores-container').addEventListener('click', handleStoreItemClick);
+        // Блок со всеми магазинами в настройках
+        document.querySelector('.stores-container').addEventListener('click', handleStoreItemClick);
 
-    // Добавить новый магазин
-    const newStoreForm = document.querySelector('#new-store');
-    newStoreForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const newStoreInput = document.querySelector('#store-url')
-        const newStoreValue = newStoreInput.value;
-        const url = `${window.location.origin}/api/v1/new_store/`;
-        const bodyData = JSON.stringify(
-            {
-                new_store: newStoreValue
-            }
-        )
-        fetchData(url, 'POST', 'application/json', bodyData)
-            .then(data => {
-                if (data.status) {
-                    const newStoreItem = document.createElement('div');
-                    newStoreItem.classList.add('store-items');
-                    newStoreItem.setAttribute('data-store-id', data.store_id);
-                    newStoreItem.innerHTML = `
+        // Добавить новый магазин
+        const newStoreForm = document.querySelector('#new-store');
+        newStoreForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const newStoreInput = document.querySelector('#store-url')
+            const newStoreValue = newStoreInput.value;
+            const url = `${window.location.origin}/api/v1/new_store/`;
+            let status = null;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({new_store: newStoreValue})
+            })
+                .then(response => {
+                    status = response.status === 201;
+                    return response.json()
+                })
+                .then(data => {
+                    if (status) {
+                        const newStoreItem = document.createElement('div');
+                        newStoreItem.classList.add('store-items');
+                        newStoreItem.setAttribute('data-store-id', data.store_id);
+                        newStoreItem.innerHTML = `
                     <a href="#" class="store-delete" data-action="store-delete">
                         <i class="fa fa-trash-o fa-lg mr-2" aria-hidden="true"></i>
                     </a>
@@ -136,16 +133,15 @@ if (window.location.pathname === '/profile/settings/') {
                     </a>
                     ${newStoreValue}
                 `;
-
-                    const storesContainer = document.querySelector('.stores-container');
-                    storesContainer.appendChild(newStoreItem);
-                }
-                messageAlert(data.message, data.status)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    });
+                        const storesContainer = document.querySelector('.stores-container');
+                        storesContainer.appendChild(newStoreItem);
+                    }
+                    messageAlert(data.message, status)
+                })
+                .catch(error => {
+                    console.error('ошибка', error)
+                })
+        });
 
 
     // Форма получения данных для отзывов

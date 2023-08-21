@@ -67,3 +67,53 @@ class NewStoreTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data.get('message'), f'Магазин {store_name} уже добавлен')
 
+
+class ManageStoreTestCase(TestCase):
+    def setUp(self):
+        """
+        Инициализация перед каждым тестом
+        Добавление пользователя. Создание клиента
+        По умолчанию, после добавления магазина присваивается статус False
+        """
+        username = 'testuser'
+        password = 'testpassword'
+        store_url = 'https://kazanexpress.ru/kazanexpress'
+        self.user = User.objects.create_user(username=username, password=password)
+        self.client.login(username=username, password=password)
+        Stores.objects.create(user=self.user, store_url=store_url)
+
+    def test_update_store_status_success(self):
+        """
+        Успешная смана статуса магазина
+        Статус код 202
+        """
+        url = reverse('rest:store_status')
+        data = {'store_id': self.user.pk, 'store_status': 'False'}
+        response = self.client.put(path=url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), True)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+    def test_update_store_status_fail(self):
+        """
+        Ошибка при смене статуса магазина.
+        Не обнаружен магазин с заданным ID
+        Статус код 404
+        """
+        url = reverse('rest:store_status')
+        data = {'store_id': 100, 'store_status': 'False'}
+        response = self.client.put(path=url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Магазин не найден')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_store_status_nok(self):
+        """
+        Ошибка при смене статуса.
+        Не передан ID магазина
+        Статус код 400
+        """
+        url = reverse('rest:store_status')
+        data = {'store_id': '', 'store_status': 'False'}
+        response = self.client.put(path=url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Не корректное переключение статуса')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
