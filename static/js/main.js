@@ -263,7 +263,6 @@ if (window.location.pathname === '/profile/settings/') {
         }
     }
 
-
     // Добавить/изменить аватар пользователя
     const avatarForm = document.querySelector('#avatar-form');
     avatarForm.addEventListener('submit', function (e) {
@@ -271,12 +270,27 @@ if (window.location.pathname === '/profile/settings/') {
         const url = `${window.location.origin}/api/v1/avatar/`
         const userPicture = document.querySelector('#avatar-input')
         const formData = new FormData();
+        const headers = {
+            'X-CSRFToken': csrfToken
+        }
+        let status = null;
         formData.append('picture', userPicture.files[0]);
-        fetchData(url, 'POST', '', formData)
+        fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        })
+            .then(response => {
+                status = response.status === 201;
+                return response.json()
+            })
             .then(data => {
-                if (data.status) {
+                if (status){
                     const profileIMG = document.querySelector('.profile-img');
                     profileIMG.src = URL.createObjectURL(formData.get('picture'));
+                    messageAlert(data.message, true)
+                } else {
+                    messageAlert(data.message, false)
                 }
             })
             .catch(error => {

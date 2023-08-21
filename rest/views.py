@@ -142,18 +142,15 @@ class UserPicView(APIView):
     def post(self, request):
         picture = request.data.get('picture')
         if picture:
-            user_data, created = User.objects.update_or_create(
-                id=request.user.pk,
-                defaults={
-                    'image': picture
-                }
-            )
-            if created:
-                return Response({'message': 'Аватар добавлен', 'status': True})
-            else:
-                return Response({'message': 'Аватар обновлен', 'status': True})
+            try:
+                user = User.objects.get(id=request.user.pk)
+                user.image = picture
+                user.save()
+                return Response({'message': 'Аватар добавлен'}, status=status.HTTP_201_CREATED)
+            except ObjectDoesNotExist:
+                return Response({'message': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'message': 'Добавьте изображение', 'status': False})
+            return Response({'message': 'Добавьте изображение'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetNewTokenView(APIView):
