@@ -5,7 +5,7 @@
         <ul class="nav">
             <li><a href="{% url 'start_page:start_page_url' %}">На главную</a></li>
             {% if user.is_authenticated %}
-                <li><a href="{% url 'users_cabinet:users_profile_url' %}" class="no-project">Личный кабинет</a></li>
+                <li><a href="{% url 'users_cabinet:profile_settings_url' %}" class="no-project">Личный кабинет</a></li>
             {% else %}
                 <li><a href="{% url 'users:auth_page_url' %}">Авторизация</a></li>
             {% endif %}
