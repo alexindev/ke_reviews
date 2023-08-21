@@ -125,19 +125,16 @@ class ReviewSettingsView(APIView):
         username = request.data.get('login')
         password = request.data.get('password')
         if username and password:
-            user_data, created = User.objects.update_or_create(
+            User.objects.update_or_create(
                 id=request.user.pk,
                 defaults={
                     'login_ke': username,
                     'pass_ke': password
                 }
             )
-            if created:
-                return Response({'message': 'Учетная запись добавлена', 'status': True})
-            else:
-                return Response({'message': 'Данные учетной записи обновлены', 'status': True})
+            return Response({'message': 'Данные учетной записи обновлены'}, status=status.HTTP_202_ACCEPTED)
         else:
-            return Response({'message': 'Необходимо заполнить все поля', 'status': False})
+            return Response({'message': 'Необходимо заполнить все поля'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserPicView(APIView):

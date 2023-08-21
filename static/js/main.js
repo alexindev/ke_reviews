@@ -169,18 +169,36 @@ if (window.location.pathname === '/profile/settings/') {
     const reviewForm = document.querySelector('#review-data');
     reviewForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        const reviewLogin = document.querySelector('#review-login').value
-        const reviewPassword = document.querySelector('#review-password').value
+        const reviewLogin = document.querySelector('#review-login').value;
+        const reviewPassword = document.querySelector('#review-password').value;
         const url = `${window.location.origin}/api/v1/review/`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        };
         const bodyData = JSON.stringify(
             {
                 login: reviewLogin,
                 password: reviewPassword
             }
-        )
-        fetchData(url, 'PUT', 'application/json', bodyData)
+        );
+        let status = null;
+        fetch(url, {
+            method: 'PUT',
+            headers: headers,
+            body: bodyData
+        })
+            .then(response => {
+                status = response.status === 202;
+                return response.json()
+                }
+            )
             .then(data => {
-                messageAlert(data.message, data.status)
+                if (status) {
+                    messageAlert(data.message, true)
+                } else {
+                    messageAlert(data.message, false)
+                }
             })
             .catch(error => {
                 console.log(error)

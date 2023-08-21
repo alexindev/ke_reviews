@@ -154,3 +154,37 @@ class ManageStoreTestCase(TestCase):
         self.assertEqual(response.data.get('message'), 'Ошибка удаления магазина')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
+class ReviewSettingsTestCase(TestCase):
+    def setUp(self):
+        """
+        Инициализация перед каждым тестом
+        Добавление пользователя.
+        """
+        username = 'testuser'
+        password = 'testpassword'
+        self.url = reverse('rest:review')
+        self.user = User.objects.create_user(username=username, password=password)
+        self.client.login(username=username, password=password)
+
+    def test_update_review_settings_success(self):
+        """
+        Успешное добавление данных для учетной записи
+        Статус код 202
+        """
+        data = {'login': 'testlogin', 'password': 'testpassword'}
+        response = self.client.put(path=self.url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Данные учетной записи обновлены')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+    def test_upadate_review_setting_fail(self):
+        """
+        Ошибка при добавлении учетных данных.
+        Не все поля заполнены
+        Статус код 400
+        """
+        data = {'login': 'testlogin', 'password': ''}
+        response = self.client.put(path=self.url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Необходимо заполнить все поля')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
