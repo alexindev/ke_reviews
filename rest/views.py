@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from rest_framework import status
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
 
@@ -68,14 +69,14 @@ class DeleteStoreView(APIView):
     def delete(self, request):
         store_id = request.data.get('store_id')
         if store_id:
-            store = Stores.objects.get(id=store_id)
-            if store:
+            try:
+                store = Stores.objects.get(id=store_id)
                 store.delete()
-                return Response({'message': f'Магазин {store} удален', 'status': True})
-            else:
-                return Response({'message': 'Магазин не найден', 'status': False})
+                return Response({'message': f'Магазин {store.store_name} удален'}, status=status.HTTP_202_ACCEPTED)
+            except ObjectDoesNotExist:
+                return Response({'message': 'Магазин не найден'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'message': 'Ошибка удаления магазина', 'status': False})
+            return Response({'message': 'Ошибка удаления магазина'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateStoreStatusView(APIView):
@@ -84,44 +85,50 @@ class UpdateStoreStatusView(APIView):
         store_id = request.data.get('store_id')
         store_status = request.data.get('store_status')
         if store_id and store_status:
-            store_status = False if store_status == 'True' else True
-            store = Stores.objects.get(id=store_id)
-            store.status = store_status
-            store.save()
-            return Response({'message': f'{store_status}', 'status': True})
+            try:
+                store_status = False if store_status == 'True' else True
+                store = Stores.objects.get(id=store_id)
+                store.status = store_status
+                store.save()
+                return Response({'message': str(store_status)}, status=status.HTTP_202_ACCEPTED)
+            except ObjectDoesNotExist:
+                return Response({'message': 'Магазин не найден'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'message': 'Не корректное переключение статуса', 'status': False})
+            return Response({'message': 'Не корректное переключение статуса'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NewStoreView(APIView):
     """Добавить новый магазин"""
     def post(self, request):
         store_url: str = request.data.get('new_store').strip()
-        store_name = store_url.split('/')[-1]
         if store_url:
+            store_name = store_url.split('/')[-1]
             if not Stores.objects.filter(user=request.user, store_url=store_url).exists():
                 if get_store(store_url):
                     store = Stores.objects.create(store_url=store_url, store_name=store_name, user=request.user)
                     return Response(
-                        {'message': f'Магазин {store_name} успешно добавлен', 'store_id': store.id, 'status': True})
+                        {'message': f'Магазин {store_name} успешно добавлен', 'store_id': store.id},
+                        status=status.HTTP_201_CREATED)
                 else:
-                    return Response({'message': f'{store_name} - данного магазина не существует', 'status': False})
+                    return Response({'message': f'{store_name} - данного магазина не существует'},
+                                    status=status.HTTP_404_NOT_FOUND)
             else:
-                return Response({'message': f'Магазин {store_name} уже добавлен', 'status': False})
+                return Response({'message': f'Магазин {store_name} уже добавлен'},
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'message': 'Введите ссылку на магазин', 'status': False})
+            return Response({'message': 'Введите ссылку на магазин'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewSettingsView(APIView):
     """Добавить/обновить данные учетной записи для отзывов"""
     def put(self, request):
-        login = request.data.get('login')
+        username = request.data.get('login')
         password = request.data.get('password')
-        if login and password:
+        if username and password:
             user_data, created = User.objects.update_or_create(
                 id=request.user.pk,
                 defaults={
-                    'login_ke': login,
+                    'login_ke': username,
                     'pass_ke': password
                 }
             )
@@ -160,7 +167,7 @@ class GetNewTokenView(APIView):
         pass_ke = user.pass_ke
 
         if not login_ke or not pass_ke:
-            return Response({'message': 'Логин и/или пароль не добавлены', 'status': False})
+            return Response({'message': 'Логин и пароль не добавлены', 'status': False})
 
         task = new_token.delay(request.user.pk, login_ke, pass_ke)
         return Response({'message': 'Получаем токен...', 'task_id': task.id, 'status': True})
