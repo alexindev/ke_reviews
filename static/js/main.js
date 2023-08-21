@@ -19,28 +19,6 @@ function messageAlert(message, status) {
 }
 
 
-// Отправка и получение запроса
-function fetchData(url, method, contentType, bodyData) {
-    const headers = {
-        'X-CSRFToken': csrfToken,
-    };
-
-    if (contentType) {
-        headers['Content-Type'] = contentType;
-    }
-
-    return fetch(url, {
-        method: method,
-        headers: headers,
-        body: bodyData
-    })
-        .then(response => response.json())
-        .catch(error => {
-            console.log(error)
-        })
-}
-
-
 // Функция для обработки клика по элементам store-items
 function handleStoreItemClick(event) {
     event.preventDefault();
@@ -169,18 +147,36 @@ if (window.location.pathname === '/profile/settings/') {
     const reviewForm = document.querySelector('#review-data');
     reviewForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        const reviewLogin = document.querySelector('#review-login').value
-        const reviewPassword = document.querySelector('#review-password').value
+        const reviewLogin = document.querySelector('#review-login').value;
+        const reviewPassword = document.querySelector('#review-password').value;
         const url = `${window.location.origin}/api/v1/review/`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        };
         const bodyData = JSON.stringify(
             {
                 login: reviewLogin,
                 password: reviewPassword
             }
-        )
-        fetchData(url, 'PUT', 'application/json', bodyData)
+        );
+        let status = null;
+        fetch(url, {
+            method: 'PUT',
+            headers: headers,
+            body: bodyData
+        })
+            .then(response => {
+                status = response.status === 202;
+                return response.json()
+                }
+            )
             .then(data => {
-                messageAlert(data.message, data.status)
+                if (status) {
+                    messageAlert(data.message, true)
+                } else {
+                    messageAlert(data.message, false)
+                }
             })
             .catch(error => {
                 console.log(error)
@@ -193,13 +189,19 @@ if (window.location.pathname === '/profile/settings/') {
         e.preventDefault();
         getTokenBtn.disabled = true;
         const url = `${window.location.origin}/api/v1/get_token/`;
+        let status = null;
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                status = response.status === 202;
+                return response.json();
+
+            })
             .then(data => {
-                messageAlert(data.message, data.status);
-                if (data.status) {
+                if (status){
+                    messageAlert(data.message, true);
                     setTimeout(() => getTokenTaskStatus(data.task_id), 1000)
                 } else {
+                    messageAlert(data.message, false)
                     getTokenBtn.disabled = false;
                 }
             })
@@ -245,7 +247,6 @@ if (window.location.pathname === '/profile/settings/') {
         }
     }
 
-
     // Добавить/изменить аватар пользователя
     const avatarForm = document.querySelector('#avatar-form');
     avatarForm.addEventListener('submit', function (e) {
@@ -253,12 +254,27 @@ if (window.location.pathname === '/profile/settings/') {
         const url = `${window.location.origin}/api/v1/avatar/`
         const userPicture = document.querySelector('#avatar-input')
         const formData = new FormData();
+        const headers = {
+            'X-CSRFToken': csrfToken
+        }
+        let status = null;
         formData.append('picture', userPicture.files[0]);
-        fetchData(url, 'POST', '', formData)
+        fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        })
+            .then(response => {
+                status = response.status === 201;
+                return response.json()
+            })
             .then(data => {
-                if (data.status) {
+                if (status){
                     const profileIMG = document.querySelector('.profile-img');
                     profileIMG.src = URL.createObjectURL(formData.get('picture'));
+                    messageAlert(data.message, true)
+                } else {
+                    messageAlert(data.message, false)
                 }
             })
             .catch(error => {

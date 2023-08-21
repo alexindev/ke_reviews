@@ -47,7 +47,7 @@ function authPage() {
             })
                 .then(response => {
                     if (response.status === 200) {
-                        window.location.href = `${window.location.origin}/profile/dashboard/`;
+                        window.location.href = `${window.location.origin}/profile/settings/`;
                     } else {
                         return response.json()
                     }

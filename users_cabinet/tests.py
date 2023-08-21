@@ -58,7 +58,6 @@ class NewStoreTestCase(TestCase):
         Магазин уже добавлен
         Статус код 400
         """
-        self.url = reverse('rest:store_status')
         store_name = 'kazanexpress'
         store_url = f'https://kazanexpress.ru/{store_name}'
         data = {'new_store': store_url}
@@ -70,6 +69,7 @@ class NewStoreTestCase(TestCase):
 
 
 class ManageStoreTestCase(TestCase):
+
     def setUp(self):
         """
         Инициализация перед каждым тестом
@@ -90,7 +90,7 @@ class ManageStoreTestCase(TestCase):
         Статус код 202
         """
         url = reverse('rest:store_status')
-        data = {'store_id': self.user.pk, 'store_status': 'False'}
+        data = {'store_id': self.store.pk, 'store_status': 'False'}
         response = self.client.put(path=url, data=data, content_type='application/json')
         self.assertEqual(response.data.get('message'), 'True')
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
@@ -153,4 +153,73 @@ class ManageStoreTestCase(TestCase):
         response = self.client.delete(path=url, data=data, content_type='application/json')
         self.assertEqual(response.data.get('message'), 'Ошибка удаления магазина')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class ReviewSettingsTestCase(TestCase):
+    def setUp(self):
+        """
+        Инициализация перед каждым тестом
+        Добавление пользователя.
+        """
+        username = 'testuser'
+        password = 'testpassword'
+        self.url = reverse('rest:review')
+        self.user = User.objects.create_user(username=username, password=password)
+        self.client.login(username=username, password=password)
+
+    def test_update_review_settings_success(self):
+        """
+        Успешное добавление данных для учетной записи
+        Статус код 202
+        """
+        data = {'login': 'testlogin', 'password': 'testpassword'}
+        response = self.client.put(path=self.url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Данные учетной записи обновлены')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+    def test_upadate_review_setting_fail(self):
+        """
+        Ошибка при добавлении учетных данных.
+        Не все поля заполнены
+        Статус код 400
+        """
+        data = {'login': 'testlogin', 'password': ''}
+        response = self.client.put(path=self.url, data=data, content_type='application/json')
+        self.assertEqual(response.data.get('message'), 'Необходимо заполнить все поля')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class UserPicTestCase(TestCase):
+    def setUp(self):
+        """
+        Инициализация перед каждым тестом
+        Добавление пользователя.
+        """
+        username = 'testuser'
+        password = 'testpassword'
+        self.url = reverse('rest:avatar')
+        self.user = User.objects.create_user(username=username, password=password)
+        self.client.login(username=username, password=password)
+
+    def test_change_userpic_success(self):
+        """
+        Успешная смена аватара пользователя
+        Статус код 201
+        """
+        data = {'picture': b'new_image.jpg'}
+        response = self.client.post(path=self.url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data.get('message'), 'Аватар добавлен')
+
+    def test_change_userpic_fail(self):
+        """
+        Ошибка при смене аватара
+        Запрос без изображения
+        Статус код 400
+        """
+        data = {'picture': b''}
+        response = self.client.post(path=self.url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data.get('message'), 'Добавьте изображение')
+
 

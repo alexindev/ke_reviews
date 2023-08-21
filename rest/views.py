@@ -125,19 +125,16 @@ class ReviewSettingsView(APIView):
         username = request.data.get('login')
         password = request.data.get('password')
         if username and password:
-            user_data, created = User.objects.update_or_create(
+            User.objects.update_or_create(
                 id=request.user.pk,
                 defaults={
                     'login_ke': username,
                     'pass_ke': password
                 }
             )
-            if created:
-                return Response({'message': 'Учетная запись добавлена', 'status': True})
-            else:
-                return Response({'message': 'Данные учетной записи обновлены', 'status': True})
+            return Response({'message': 'Данные учетной записи обновлены'}, status=status.HTTP_202_ACCEPTED)
         else:
-            return Response({'message': 'Необходимо заполнить все поля', 'status': False})
+            return Response({'message': 'Необходимо заполнить все поля'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserPicView(APIView):
@@ -145,18 +142,15 @@ class UserPicView(APIView):
     def post(self, request):
         picture = request.data.get('picture')
         if picture:
-            user_data, created = User.objects.update_or_create(
-                id=request.user.pk,
-                defaults={
-                    'image': picture
-                }
-            )
-            if created:
-                return Response({'message': 'Аватар добавлен', 'status': True})
-            else:
-                return Response({'message': 'Аватар обновлен', 'status': True})
+            try:
+                user = User.objects.get(id=request.user.pk)
+                user.image = picture
+                user.save()
+                return Response({'message': 'Аватар добавлен'}, status=status.HTTP_201_CREATED)
+            except ObjectDoesNotExist:
+                return Response({'message': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'message': 'Добавьте изображение', 'status': False})
+            return Response({'message': 'Добавьте изображение'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetNewTokenView(APIView):
@@ -167,10 +161,10 @@ class GetNewTokenView(APIView):
         pass_ke = user.pass_ke
 
         if not login_ke or not pass_ke:
-            return Response({'message': 'Логин и пароль не добавлены', 'status': False})
+            return Response({'message': 'Логин и пароль не добавлены'}, status=status.HTTP_400_BAD_REQUEST)
 
         task = new_token.delay(request.user.pk, login_ke, pass_ke)
-        return Response({'message': 'Получаем токен...', 'task_id': task.id, 'status': True})
+        return Response({'message': 'Получаем токен...', 'task_id': task}, status=status.HTTP_202_ACCEPTED)
 
 
 class GetTaskStatusView(APIView):

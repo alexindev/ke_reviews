@@ -5,16 +5,9 @@ from django.contrib.auth import logout
 from django.urls import reverse_lazy
 from django.utils import timezone
 
-from users.models import User
 from users_cabinet.models import ProductData, Stores, Reviews
 
 from common.title import TitleMixin
-
-
-class ProfileView(TitleMixin, ListView):
-    template_name = 'users_cabinet/profile.html'
-    model = User
-    title = 'Главное меню'
 
 
 class SettingsView(TitleMixin, SuccessMessageMixin, ListView):
