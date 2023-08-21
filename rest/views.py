@@ -161,10 +161,10 @@ class GetNewTokenView(APIView):
         pass_ke = user.pass_ke
 
         if not login_ke or not pass_ke:
-            return Response({'message': 'Логин и пароль не добавлены', 'status': False})
+            return Response({'message': 'Логин и пароль не добавлены'}, status=status.HTTP_400_BAD_REQUEST)
 
         task = new_token.delay(request.user.pk, login_ke, pass_ke)
-        return Response({'message': 'Получаем токен...', 'task_id': task.id, 'status': True})
+        return Response({'message': 'Получаем токен...', 'task_id': task}, status=status.HTTP_202_ACCEPTED)
 
 
 class GetTaskStatusView(APIView):
