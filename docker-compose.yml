@@ -42,11 +42,26 @@ services:
     restart: always
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./static:/static
       - ./media:/media
+      - ./nginx/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/certbot/www:/var/www/certbot:ro
+    links:
+      - myapp
     depends_on:
       - myapp
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt:rw
+      - ./nginx/certbot/www:/var/www/certbot:rw
+#    command: certonly --webroot --webroot-path=/var/www/certbot/ --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email -d ${CERTBOT_DOMAIN} -d ${CERTBOT_WWW_DOMAIN}
+    depends_on:
+      - nginx
 
   myapp:
     build: .
