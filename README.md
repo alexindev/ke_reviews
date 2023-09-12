@@ -68,5 +68,5 @@ sudo docker compose up --build -d
 ## Стек технологий:
 
 ```
-Docker, Python, Django, DRF, Redis, Celery, Playwright, JavaScript, HTML, Bototstrap, CSS
+Python, Django, DRF, Redis, Celery, Playwright, JavaScript, HTML, Bototstrap, CSS, Docker
 ```
