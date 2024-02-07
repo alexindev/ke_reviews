@@ -19,7 +19,7 @@ KE SERVICES - это набор инструментов для продавцо
 
 #### 1. Обновить список пакетов:
 ```
-sudo apt update
+sudo apt-get update && apt-get upgrade -y
 ```
 
 #### 2. Установить необходимые пакеты 
@@ -39,7 +39,6 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 
 #### 5. Установка Docker
 ```
-sudo apt-get update
 sudo apt-get install -y docker-ce docker-compose
 ```
 

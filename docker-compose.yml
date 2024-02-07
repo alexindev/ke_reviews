@@ -3,27 +3,33 @@ version: "3.8"
 services:
   database:
     image: postgres:15.0-alpine
-    container_name: postgres
+    container_name: database
     restart: always
-    env_file: .env
+    env_file:
+      - .env
     volumes:
       - .postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   broker:
     image: redis:alpine
-    container_name: redis
+    container_name: broker
     restart: always
 
   celery:
-    build:
-      dockerfile: Dockerfile
+    build: .
     container_name: celery
     restart: always
     env_file:
       - .env
-    command: bash -c "celery -A ke_service worker --beat --scheduler django --loglevel=info" #playwright install --with-deps chromium &&
+    command: bash -c "celery -A ke_service worker --beat --scheduler django --loglevel=info"
     depends_on:
-      - myapp
+      myapp:
+        condition: service_healthy
 
   celery_flower:
     image: mher/flower
@@ -48,10 +54,9 @@ services:
       - ./media:/media
       - ./nginx/certbot/conf:/etc/letsencrypt:ro
       - ./nginx/certbot/www:/var/www/certbot:ro
-    links:
-      - myapp
     depends_on:
-      - myapp
+      myapp:
+        condition: service_healthy
 
   certbot:
     image: certbot/certbot
@@ -59,7 +64,6 @@ services:
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt:rw
       - ./nginx/certbot/www:/var/www/certbot:rw
-#    command: certonly --webroot --webroot-path=/var/www/certbot/ --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email -d ${CERTBOT_DOMAIN} -d ${CERTBOT_WWW_DOMAIN}
     depends_on:
       - nginx
 
@@ -72,8 +76,14 @@ services:
       - "8000:8000"
     command: /app/entrypoint.sh
     depends_on:
-      - database
-      - broker
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl http://localhost:8000/ || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
 volumes:
   postgres_data:
